@@ -1,33 +1,47 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Button, Divider } from "react-native-paper";
-import * as Google from "expo-google-app-auth";
-// import * as Facebook from "expo-facebook";
+import { StatusBar } from 'expo-status-bar';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Colors,
+  TextInput,
+  Button,
+  Divider,
+} from 'react-native-paper';
 import { GOOGLE_CLIENT_ID } from "../config/devProduction";
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
+import * as Google from 'expo-auth-session/providers/google';
 import axiosInstance from "../axios/orgin";
-import * as SecureStore from 'expo-secure-store';
 import { useDispatch } from "react-redux";
 import { loginSuccessUpdate } from "../reducers/authSlice";
-// import * as WebBrowser from 'expo-web-browser';
-// import * as AuthSession from 'expo-auth-session';
-// import * as Google from 'expo-auth-session/providers/google';
-// const useProxy = false;
-// const redirectUri = AuthSession.makeRedirectUri({
-//   useProxy,
-// });
-// WebBrowser.maybeCompleteAuthSession();
-/**
- * @author
- * @function LoignGoogle
- **/
-export const SignInScreen = (props) => {
+
+const useProxy = false;
+const redirectUri = AuthSession.makeRedirectUri({
+  useProxy,
+});
+
+console.log(GOOGLE_CLIENT_ID);
+WebBrowser.maybeCompleteAuthSession();
+
+  export const SignInScreen = (props) => {
   const dispatch = useDispatch();
+
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    // expoClientId: GOOGLE_CLIENT_ID,
+    // iosClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
+    androidClientId:GOOGLE_CLIENT_ID,
+    // webClientId:GOOGLE_CLIENT_ID,
+  });
+
+
   const tokenFromServer = (access_token) => {
     // console.log("hello form start of tokenfrom server", access_token);
     axiosInstance
       .post("/user/googlelogin/android", { access_token })
       .then(async (userDataFromBackEnd) => {
-        const jwtUserToken = await SecureStore.setItemAsync(
+        const jwtUserToken = await AsyncStorage.setItem(
           "token",
           userDataFromBackEnd.data.jwtToken
         );
@@ -38,67 +52,54 @@ export const SignInScreen = (props) => {
           userDataFromBackEnd.data.jwtToken
         );
         // console.log("jwt token received from backend", UserDataFromBackEnd.data);
-      });
+      })
+      .catch((e)=>{
+        console.log(e)
+      })
   };
-  // const facebook = async () => {
-  //   console.log("facebook button clicked");
+
+  React.useEffect(async () => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      // console.log(authentication);
+      // initial(authentication.accessToken);
+      console.log(authentication.accessToken)
+      const token = await tokenFromServer(authentication.accessToken);
+    }
+  }, [response]);
+
+  // const initial = async (accessToken) => {
+  //   // console.log(accessToken);
   //   try {
-  //     await Facebook.initializeAsync({
-  //       appId: "560468131564472",
+  //     const userInfoResponse = await fetch(
+  //       'https://www.googleapis.com/userinfo/v2/me',
+  //       {
+  //         headers: { Authorization: `Bearer ${accessToken}` },
+  //       }
+  //     );
+  //     const user = await userInfoResponse.json();
+  //     var res = await fetch(`/auth/googleapp`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ profile: user, accessToken }),
   //     });
-  //     const { type, token, expirationDate, permissions, declinedPermissions } =
-  //       await Facebook.logInWithReadPermissionsAsync({
-  //         permissions: ["public_profile"],
-  //       });
-  //     if (type === "success") {
-  //       // Get the user's name using Facebook's Graph API
-  //       const response = await fetch(
-  //         `https://graph.facebook.com/me?access_token=${token}`
-  //       );
-  //       Alert.alert("Logged in!", `Hi ${(await response.json()).name}!`);
-  //     } else {
-  //       // type === 'cancel'
-  //     }
-  //   } catch ({ message }) {
-  //     alert(`Facebook Login Error: ${message}`);
+  //     res = await res.json();
+  //     // console.log(res);
+  //     // AsyncStorage.setItem('token', res.accesstoken).then(() => {
+  //     //   navigation.replace('Tab');
+  //     // });
+  //   } catch (e) {
+  //     console.log(e);
   //   }
   // };
 
+  // console.log(response);
+
   const google = async () => {
-    try {
-      console.log(GOOGLE_CLIENT_ID)
-      const { type, accessToken, user } = await Google.logInAsync({
-        // androidClientId: GOOGLE_CLIENT_ID,
-        clientId: GOOGLE_CLIENT_ID
-      });
-      if (type === "success") {
-        // console.log("AccessToken", type, accessToken, user);
-        const token = await tokenFromServer(accessToken);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    promptAsync({ useProxy });
   };
-  // const google = async () => {
-  //   try {
-  //     console.log(GOOGLE_CLIENT_ID)
-  //     const [request, response, promptAsync] = Google.useAuthRequest({
-  //       expoClientId:
-  //         GOOGLE_CLIENT_ID,
-  //       // iosClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
-  //       androidClientId:
-  //         GOOGLE_CLIENT_ID,
-  //       webClientId:
-  //         GOOGLE_CLIENT_ID,
-  //     });
-  //     // if (type === "success") {
-  //     //   // console.log("AccessToken", type, accessToken, user);
-  //     //   const token = await tokenFromServer(accessToken);
-  //     // }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   return (
     <View style={styles.container}>
@@ -126,7 +127,7 @@ export const SignInScreen = (props) => {
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   loginContainer: {
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: "column",
+    flexDirection: "column",  
   },
   msg: {
     color: "#0088cc",

@@ -86,7 +86,8 @@ import {
 export const MyApp = () => {
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.auth.loginLoading);
-  const isLoggedIn = useSelector((state) => state.auth.loginSuccess);
+  // const isLoggedIn = useSelector((state) => state.auth.loginSuccess);
+  const isLoggedIn = true
   // console.log("is logged in<<", isLoggedIn);
 
   // const linking = {
