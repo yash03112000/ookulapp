@@ -1,71 +1,200 @@
-import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import RazorpayCheckout from 'react-native-razorpay';
-import * as SecureStore from 'expo-secure-store';
-// import axiosInstance from "./axios/orgin";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-const Button = ({ label, onPress }) => (
-  <TouchableOpacity style={styles.buttonContainer} onPress={onPress}>
-    <Text style={styles.buttonText}>{label}</Text>
-  </TouchableOpacity>
-);
+// import SplashScreen from "./screen/SplashScreen";
+import { SignInScreen } from "./screen/SignInScreen";
+// import { SignUpScreen } from "./screen/SignUpScreen";
+// import { HomeScreen } from "./screen/HomeScreen";
+// import { MyCoursesScreen } from "./screen/MyCoursesScreen";
+// import { MyTestScreen } from "./screen/MyTestScreen";
+// import { DownloadsScreen } from "./screen/DownloadsScreen";
+// import { SettingsScreen } from "./screen/SettingsScreen";
+// import { CourseScreen } from "./screen/CourseScreen";
+// import { CourseSingle } from "./screen/CourseSingle";
+// import { CourseDetails } from "./screen/CourseDetails";
 
-export default function App() {
+import { Provider } from "react-redux";
+import { Provider as PaperProvider } from "react-native-paper";
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+import store from "./reduxApp/store";
+import {
+  // emailIdUpdate,
+  loginFailUpdate,
+  loginSuccessUpdate,
+} from "./reducers/authSlice";
+// import { jwtauthtoken } from "./config/devProduction";
+// import * as Linking from "expo-linking";
+// import { Cart } from "./screen/CartScreen";
+
+// const prefix = Linking.makeUrl("/");
+
+// function HomeScreenComponents() {
+//   return (
+//     <Stack.Navigator>
+//       <Stack.Screen
+//         name="HomeScreen"
+//         component={HomeScreen}
+//         // component={CourseSingle}
+//         // component={SingleCourseScreen}
+//         options={{ headerShown: false }}
+//       />
+//       <Stack.Screen
+//         name="CourseSingle"
+//         component={CourseSingle}
+//         options={{ headerShown: false }}
+//       />
+//       <Stack.Screen
+//         name="CourseDetails"
+//         component={CourseDetails}
+//         options={{ headerShown: false }}
+//       />
+//       <Stack.Screen
+//         name="Cart"
+//         component={Cart}
+//         options={{ headerShown: false }}
+//       />
+//     </Stack.Navigator>
+//   );
+// }
+
+
+// function MyCoursesScreenComponents() {
+//   return (
+//     <Stack.Navigator>
+//       <Stack.Screen
+//         name="MyCourses"
+//         component={MyCoursesScreen}
+//         // component={CourseSingle}
+//         // component={SingleCourseScreen}
+//         options={{ headerShown: false }}
+//       />
+//       <Stack.Screen
+//         name="CourseSingle"
+//         component={CourseSingle}
+//         options={{ headerShown: false }}
+//       />
+//     </Stack.Navigator>
+//   );
+// }
+
+export const MyApp = () => {
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state) => state.auth.loginLoading);
+  const isLoggedIn = useSelector((state) => state.auth.loginSuccess);
+  // console.log("is logged in<<", isLoggedIn);
+
+  // const linking = {
+  //   prefixes: [prefix],
+  //   config: {
+  //     screens: {
+  //       HomeScreen,
+  //       MyCoursesScreen,
+  //       MyTestScreen,
+  //       DownloadsScreen,
+  //       SettingsScreen,
+  //       SplashScreen,
+  //       SignInScreen,
+  //       SignUpScreen,
+  //       CourseScreen,
+  //     },
+  //   },
+  // };
+
+  // useEffect(() => {
+  //   async function OneTimeRun() {
+  //     try {
+  //       const jwtUserToken = await AsyncStorage.getItem("token");
+  //       if (jwtUserToken) {
+  //         dispatch(loginSuccessUpdate());
+  //       } else {
+  //         dispatch(loginFailUpdate);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  // }, []);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <Button
-        label="Open Dev Menu"
-        onPress={() => {
-          console.log("Hello")
-          var options = {
-            description: 'Credits towards consultation',
-            image: 'https://i.imgur.com/3g7nmJC.png',
-            currency: 'INR',
-            key: '<YOUR_KEY_ID>',
-            amount: '5000',
-            name: 'Acme Corp',
-            order_id: 'order_DslnoIgkIDL8Zt',//Replace this with an order_id created using Orders API.
-            prefill: {
-              email: 'gaurav.kumar@example.com',
-              contact: '9191919191',
-              name: 'Gaurav Kumar'
-            },
-            theme: {color: '#53a20e'}
-          }
-          RazorpayCheckout.open(options).then((data) => {
-            // handle success
-            alert(`Success: ${data.razorpay_payment_id}`);
-          }).catch((error) => {
-            // handle failure
-            console.log(error)
-            alert(`Error: ${error.code} | ${error.description}`);
-          });
-        }}
-      />
-      <StatusBar style="auto" />
-    </View>
+    // <NavigationContainer linking={linking}>
+    <NavigationContainer>
+      {isLoggedIn ? (
+        <>
+          <Tab.Navigator
+            screenOptions={({ route }) => ({
+              tabBarIcon: ({ focused, color, size }) => {
+                let iconName;
+                if (route.name === "Home") {
+                  iconName = focused ? "home" : "home";
+                } else if (route.name === "My Courses") {
+                  iconName = focused ? "book" : "book";
+                } else if (route.name === "My Test") {
+                  iconName = focused ? "pencil" : "pencil";
+                } else if (route.name === "Downloads") {
+                  iconName = focused ? "download" : "download";
+                } else if (route.name === "Settings") {
+                  iconName = focused ? "settings" : "settings";
+                }
+
+                // You can return any component that you like here!
+                return <Ionicons name={iconName} size={size} color={color} />;
+              },
+              tabBarActiveTintColor: "tomato",
+              tabBarInactiveTintColor: "gray",
+            })}
+          >
+            <Tab.Screen
+              name="Home"
+              options={{ title: "OOkul", tabBarLabel: "Home" }}
+              component={HomeScreenComponents}
+            />
+            <Tab.Screen name="My Courses" component={MyCoursesScreenComponents} />
+            <Tab.Screen name="My Test" component={MyTestScreen} />
+            <Tab.Screen name="Downloads" component={DownloadsScreen} />
+            <Tab.Screen name="Settings" component={SettingsScreen} />
+          </Tab.Navigator>
+        </>
+      ) : (
+        <>
+          {isLoading ? (
+            <Stack.Navigator>
+              <Stack.Screen
+                name="SplashScreen"
+                component={SplashScreen}
+                options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
+          ) : (
+            <Stack.Navigator>
+              <Stack.Screen
+                name="SignIn"
+                component={SignInScreen}
+                options={{ headerShown: false }}
+              />
+              {/* <Stack.Screen
+                name="SignUp"
+                component={SignUpScreen}
+                options={{ headerShown: false }}
+              /> */}
+            </Stack.Navigator>
+          )}
+        </>
+      )}
+    </NavigationContainer>
+  );
+};
+export default function App({ navigation }) {
+  return (
+    <Provider store={store}>
+      <PaperProvider>
+        <MyApp />
+      </PaperProvider>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonContainer: {
-    backgroundColor: "#4630eb",
-    borderRadius: 4,
-    padding: 12,
-    marginVertical: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#ffffff",
-    fontSize: 16,
-  },
-});
