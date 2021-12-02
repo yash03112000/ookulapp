@@ -34,6 +34,7 @@ export const isCourseEnrolled = (token, courseId) => {
 
 export const getStudentCourseList = (token) => {
   return new Promise((resolve, reject) => {
+    console.log('my course request')
     axiosInstance.post("/courses/enrolled", { token }).then((coursesData) => {
       const courses = coursesData.data;
       if (courses) {
@@ -42,7 +43,10 @@ export const getStudentCourseList = (token) => {
       } else {
         reject(err);
       }
-    });
+    })
+    .catch((e)=>{
+      console.log('Here at get my course',e)
+    })
   });
 };
 
@@ -56,7 +60,10 @@ export const getSectionList = (courseId) => {
       } else {
         reject(err);
       }
-    });
+    })
+    .catch((e)=>{
+      console.log('Here at Get Section',e)
+    })
   });
 };
 

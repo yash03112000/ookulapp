@@ -15,6 +15,8 @@ import * as Google from 'expo-auth-session/providers/google';
 import axiosInstance from "../axios/orgin";
 import { useDispatch } from "react-redux";
 import { loginSuccessUpdate } from "../reducers/authSlice";
+import * as SecureStore from 'expo-secure-store';
+
 
 const useProxy = false;
 const redirectUri = AuthSession.makeRedirectUri({
@@ -36,14 +38,16 @@ WebBrowser.maybeCompleteAuthSession();
   });
 
 
-  const tokenFromServer = (access_token) => {
+  const tokenFromServer = (access_token,user) => {
     // console.log("hello form start of tokenfrom server", access_token);
+    // console.log(access_token)
     axiosInstance
-      .post("/user/googlelogin/android", { access_token })
+      .post("/user/googlelogin/android", { access_token,user })
       .then(async (userDataFromBackEnd) => {
-        const jwtUserToken = await AsyncStorage.setItem(
+        const jwtUserToken = await SecureStore.setItemAsync(
           "token",
           userDataFromBackEnd.data.jwtToken
+          // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6NTk0LCJlbWFpbCI6InZpcG5rckBnbWFpbC5jb20iLCJuYW1lIjoidmlwaW4ga3VtYXIiLCJpYXQiOjE2MzU1MjI2Mzd9.XSoKcC_KnkuLXoff3BHsZItI8AzpM4N-y2wjTG8rdXI"
         );
         dispatch(loginSuccessUpdate());
         console.log(
@@ -62,38 +66,39 @@ WebBrowser.maybeCompleteAuthSession();
     if (response?.type === 'success') {
       const { authentication } = response;
       // console.log(authentication);
-      // initial(authentication.accessToken);
-      console.log(authentication.accessToken)
-      const token = await tokenFromServer(authentication.accessToken);
+      initial(authentication.accessToken);
+
     }
   }, [response]);
 
-  // const initial = async (accessToken) => {
-  //   // console.log(accessToken);
-  //   try {
-  //     const userInfoResponse = await fetch(
-  //       'https://www.googleapis.com/userinfo/v2/me',
-  //       {
-  //         headers: { Authorization: `Bearer ${accessToken}` },
-  //       }
-  //     );
-  //     const user = await userInfoResponse.json();
-  //     var res = await fetch(`/auth/googleapp`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ profile: user, accessToken }),
-  //     });
-  //     res = await res.json();
-  //     // console.log(res);
-  //     // AsyncStorage.setItem('token', res.accesstoken).then(() => {
-  //     //   navigation.replace('Tab');
-  //     // });
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
+  const initial = async (accessToken) => {
+    // console.log(accessToken);
+    try {
+      const userInfoResponse = await fetch(
+        'https://www.googleapis.com/userinfo/v2/me',
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+      const user = await userInfoResponse.json();
+      // console.log(authentication.accessToken)
+      const token = await tokenFromServer(accessToken,user);
+      // var res = await fetch(`/auth/googleapp`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ profile: user, accessToken }),
+      // });
+      // res = await res.json();
+      // console.log(res);
+      // AsyncStorage.setItem('token', res.accesstoken).then(() => {
+      //   navigation.replace('Tab');
+      // });
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   // console.log(response);
 

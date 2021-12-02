@@ -2637,6 +2637,14 @@ expo-auth-session@^3.4.2:
     invariant "^2.2.4"
     qs "6.9.1"
 
+expo-av@^10.1.3:
+  version "10.1.3"
+  resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-10.1.3.tgz#a010443d7f82398d789a89824f1d512d8b407e3c"
+  integrity sha512-zYhpYthdQ5UPuhNn3XWaMJu94XyXUNw6WEifRnKH5xUHo0Oy0XrV5JAk8iO+7WDgfGo9oHlgvnSWrMNQsbF80A==
+  dependencies:
+    "@expo/config-plugins" "^4.0.2"
+    expo-modules-core "~0.4.7"
+
 expo-constants@^12.1.3, expo-constants@~12.1.1, expo-constants@~12.1.3:
   version "12.1.3"
   resolved "https://registry.yarnpkg.com/expo-constants/-/expo-constants-12.1.3.tgz#bec48a42a7760b010450961c209bb4b1158b9cd6"
@@ -2729,7 +2737,7 @@ expo-keep-awake@~10.0.0:
   resolved "https://registry.yarnpkg.com/expo-keep-awake/-/expo-keep-awake-10.0.0.tgz#275a3e02f99bc0429790047add126c1dcce60d63"
   integrity sha512-x5zRTjIvSry/EISKvjWpnLERGZj5maCwEouOfiDk0JPa0UTg/zFkT7pmiadAfHT95XUgjjb2DOku+wj6J7el7Q==
 
-expo-linking@~2.4.2:
+expo-linking@^2.4.2, expo-linking@~2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/expo-linking/-/expo-linking-2.4.2.tgz#b042f196c9a21ee0de25ca98763592d45524b6f2"
   integrity sha512-uwUaC0npP2jQCyFD7+KfJqT+tde/WDcj56lkhd9hewnPGaYsd98pNStT74ZbMD9ewz/0WW+kjevyfmgLSe58UQ==
@@ -2779,6 +2787,15 @@ expo-secure-store@^11.0.3:
   integrity sha512-/YJV+kUWdDFYzwNibJx/noLGFG/0nN7TjoF67lpLBxd+X3KwbwrSJo6jy2LBZT49qBlptx4dPFLCjtnx6uaUiw==
   dependencies:
     expo-modules-core "~0.4.4"
+
+expo-sensors@^11.0.3:
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/expo-sensors/-/expo-sensors-11.0.3.tgz#df40d8d08531fbe543c547f12468074d51da3666"
+  integrity sha512-VTwEpB98l+pb8nML/wDFhQ18LqZ8bBDchX6HaSLdLrrtp7eYOZZ2blOa2pM8VPZa/plOPKW4iMJ3MkmZnO1f3A==
+  dependencies:
+    "@expo/config-plugins" "^4.0.2"
+    expo-modules-core "~0.4.4"
+    invariant "^2.2.4"
 
 expo-splash-screen@~0.13.4:
   version "0.13.5"

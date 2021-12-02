@@ -5,17 +5,18 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
-// import SplashScreen from "./screen/SplashScreen";
+import SplashScreen from "./screen/SplashScreen";
 import { SignInScreen } from "./screen/SignInScreen";
-// import { SignUpScreen } from "./screen/SignUpScreen";
-// import { HomeScreen } from "./screen/HomeScreen";
-// import { MyCoursesScreen } from "./screen/MyCoursesScreen";
-// import { MyTestScreen } from "./screen/MyTestScreen";
-// import { DownloadsScreen } from "./screen/DownloadsScreen";
-// import { SettingsScreen } from "./screen/SettingsScreen";
-// import { CourseScreen } from "./screen/CourseScreen";
-// import { CourseSingle } from "./screen/CourseSingle";
-// import { CourseDetails } from "./screen/CourseDetails";
+import { SignUpScreen } from "./screen/SignUpScreen";
+import { HomeScreen } from "./screen/HomeScreen";
+import { MyCoursesScreen } from "./screen/MyCoursesScreen";
+import { MyTestScreen } from "./screen/MyTestScreen";
+import { DownloadsScreen } from "./screen/DownloadsScreen";
+import { SettingsScreen } from "./screen/SettingsScreen";
+import { ProfileScreen } from "./screen/ProfileScreen";
+import { CourseScreen } from "./screen/CourseScreen";
+import { CourseSingle } from "./screen/CourseSingle";
+import { CourseDetails } from "./screen/CourseDetails";
 
 import { Provider } from "react-redux";
 import { Provider as PaperProvider } from "react-native-paper";
@@ -29,102 +30,122 @@ import {
   loginSuccessUpdate,
 } from "./reducers/authSlice";
 // import { jwtauthtoken } from "./config/devProduction";
-// import * as Linking from "expo-linking";
-// import { Cart } from "./screen/CartScreen";
+import * as Linking from "expo-linking";
+import { Cart } from "./screen/CartScreen";
 
-// const prefix = Linking.makeUrl("/");
+const prefix = Linking.makeUrl("/");
 
-// function HomeScreenComponents() {
-//   return (
-//     <Stack.Navigator>
-//       <Stack.Screen
-//         name="HomeScreen"
-//         component={HomeScreen}
-//         // component={CourseSingle}
-//         // component={SingleCourseScreen}
-//         options={{ headerShown: false }}
-//       />
-//       <Stack.Screen
-//         name="CourseSingle"
-//         component={CourseSingle}
-//         options={{ headerShown: false }}
-//       />
-//       <Stack.Screen
-//         name="CourseDetails"
-//         component={CourseDetails}
-//         options={{ headerShown: false }}
-//       />
-//       <Stack.Screen
-//         name="Cart"
-//         component={Cart}
-//         options={{ headerShown: false }}
-//       />
-//     </Stack.Navigator>
-//   );
-// }
+function HomeScreenComponents() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="HomeScreen"
+        component={HomeScreen}
+        // component={CourseSingle}
+        // component={SingleCourseScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CourseSingle"
+        component={CourseSingle}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CourseDetails"
+        component={CourseDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Cart"
+        component={Cart}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 
-// function MyCoursesScreenComponents() {
-//   return (
-//     <Stack.Navigator>
-//       <Stack.Screen
-//         name="MyCourses"
-//         component={MyCoursesScreen}
-//         // component={CourseSingle}
-//         // component={SingleCourseScreen}
-//         options={{ headerShown: false }}
-//       />
-//       <Stack.Screen
-//         name="CourseSingle"
-//         component={CourseSingle}
-//         options={{ headerShown: false }}
-//       />
-//     </Stack.Navigator>
-//   );
-// }
+function MyCoursesScreenComponents() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="MyCourses"
+        component={MyCoursesScreen}
+        // component={CourseSingle}
+        // component={SingleCourseScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CourseSingle"
+        component={CourseSingle}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function SettingScreenComponents() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="SettingsScreen"
+        component={SettingsScreen}
+        // component={CourseSingle}
+        // component={SingleCourseScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ProfileScreen"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 export const MyApp = () => {
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.auth.loginLoading);
-  // const isLoggedIn = useSelector((state) => state.auth.loginSuccess);
-  const isLoggedIn = true
+  const isLoggedIn = useSelector((state) => state.auth.loginSuccess);
+  // const isLoggedIn = true
+  // const isLoading = false
   // console.log("is logged in<<", isLoggedIn);
 
-  // const linking = {
-  //   prefixes: [prefix],
-  //   config: {
-  //     screens: {
-  //       HomeScreen,
-  //       MyCoursesScreen,
-  //       MyTestScreen,
-  //       DownloadsScreen,
-  //       SettingsScreen,
-  //       SplashScreen,
-  //       SignInScreen,
-  //       SignUpScreen,
-  //       CourseScreen,
-  //     },
-  //   },
-  // };
+  const linking = {
+    prefixes: [prefix],
+    config: {
+      screens: {
+        HomeScreen,
+        MyCoursesScreen,
+        MyTestScreen,
+        DownloadsScreen,
+        SettingsScreen,
+        SplashScreen,
+        SignInScreen,
+        SignUpScreen,
+        CourseScreen,
+      },
+    },
+  };
 
-  // useEffect(() => {
-  //   async function OneTimeRun() {
-  //     try {
-  //       const jwtUserToken = await AsyncStorage.getItem("token");
-  //       if (jwtUserToken) {
-  //         dispatch(loginSuccessUpdate());
-  //       } else {
-  //         dispatch(loginFailUpdate);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  // }, []);
+  useEffect(() => {
+    async function OneTimeRun() {
+      try {
+        const jwtUserToken = await AsyncStorage.getItem("token");
+        if (jwtUserToken) {
+          dispatch(loginSuccessUpdate());
+        } else {
+          dispatch(loginFailUpdate);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, []);
 
   return (
-    // <NavigationContainer linking={linking}>
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
+    {/* <NavigationContainer> */}
       {isLoggedIn ? (
         <>
           <Tab.Navigator
@@ -158,7 +179,7 @@ export const MyApp = () => {
             <Tab.Screen name="My Courses" component={MyCoursesScreenComponents} />
             <Tab.Screen name="My Test" component={MyTestScreen} />
             <Tab.Screen name="Downloads" component={DownloadsScreen} />
-            <Tab.Screen name="Settings" component={SettingsScreen} />
+            <Tab.Screen name="Settings" component={SettingScreenComponents} />
           </Tab.Navigator>
         </>
       ) : (
