@@ -5,26 +5,16 @@ import { Portal, Dialog, Button } from 'react-native-paper';
 import { Ionicons } from 'react-native-vector-icons';
 import { DeviceMotion } from 'expo-sensors';
 import { useIsFocused } from '@react-navigation/native';
+import * as FileSystem from 'expo-file-system';
 
 export default function LessonVideoPlayer(props) {
 	const [activeVideoUri, setactiveVideoUri] = React.useState('');
-	// const [videoCurrentPosition, setvideoCurrentPosition] = React.useState();
-	// console.log("props.uris", props.uris);
-
-	const uris = props.uris.uris;
-
-	const video = useRef(null);
-
-	useEffect(() => {
-		// console.log("<<<<<<<<<<<<<<<", uris);
-		setactiveVideoUri(uris[1]);
-	}, [uris]);
-	// console.log(uris[1])
-
 	const [status, setStatus] = useState({});
 	const [videoSettingView, setVideoSettingView] = React.useState(false);
 	const [videoDownloadView, setVideoDownloadView] = React.useState(false);
 	const [deviceOriantation, setDeviceOriantation] = React.useState();
+	const [progressValue, setProgressValue] = useState(0);
+	const [totalSize, setTotalSize] = useState(0);
 	const [speedButtonColor, setspeedButtonColor] = React.useState([
 		'gray',
 		'gray',
@@ -40,6 +30,68 @@ export default function LessonVideoPlayer(props) {
 		'',
 		'gray',
 	]);
+	const [download, setDownload] = useState({
+		quality: '',
+		on: false,
+	});
+	const [quality, setQuality] = useState(1);
+	const [downloadstatus, setDownloadstatus] = useState({
+		status1: false,
+		status2: false,
+	});
+
+	const uris = props.uris.uris;
+	const lsnid = props.lsnid;
+
+	const video = useRef(null);
+	// console.log(props);
+
+	useEffect(() => {
+		checkquality();
+	}, [uris, quality]);
+	useEffect(() => {
+		checkdownload();
+	}, [uris]);
+	// console.log(uris[1])
+
+	// console.log(activeVideoUri);
+
+	const checkquality = async () => {
+		const a =
+			'file:///data/user/0/com.ookulapp/files/' +
+			lsnid +
+			'_' +
+			videoQualities[quality] +
+			'.mp4';
+		// console.log(a);
+		const file = await FileSystem.getInfoAsync(a, {});
+		// console.log(file.exists);
+		if (file.exists) setactiveVideoUri(a);
+		else setactiveVideoUri(uris[1]);
+		setDownload({ quality: '', on: false });
+	};
+	const checkdownload = async () => {
+		const a =
+			'file:///data/user/0/com.ookulapp/files/' +
+			lsnid +
+			'_' +
+			videoQualities[1] +
+			'.mp4';
+		const b =
+			'file:///data/user/0/com.ookulapp/files/' +
+			lsnid +
+			'_' +
+			videoQualities[2] +
+			'.mp4';
+		// console.log(a);
+		// console.log(a);
+		const file = await FileSystem.getInfoAsync(a, {});
+		const status1 = file.exists;
+		const file2 = await FileSystem.getInfoAsync(b, {});
+		const status2 = file2.exists;
+		setDownloadstatus({ status1, status2 });
+	};
+
 	const checkFocused = useIsFocused();
 
 	React.useEffect(async () => {
@@ -60,6 +112,18 @@ export default function LessonVideoPlayer(props) {
 			// console.log("reading stop at ", deviceOriantation, "deg");
 		};
 	});
+
+	function formatBytes(bytes, decimals = 2) {
+		if (bytes === 0) return '0 Bytes';
+
+		const k = 1024;
+		const dm = decimals < 0 ? 0 : decimals;
+		const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+		const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+	}
 
 	const videoSpeeds = [0.5, 0.7, 1, 1.2, 1.5, 1.7, 2, 2.5];
 	const videoQualities = ['HD', 'SD', 'Low'];
@@ -90,8 +154,9 @@ export default function LessonVideoPlayer(props) {
 		// setvideoCurrentPosition(videoPlayerStatus.positionMillis);
 
 		console.log('video status positionMillis ', videoTime);
+		setQuality(qIndex);
 
-		setactiveVideoUri(uris[qIndex]);
+		// setactiveVideoUri(uris[qIndex]);
 		if (qIndex === 0) {
 			setqualityButtonColor(['', 'gray', 'gray']);
 		} else if (qIndex === 1) {
@@ -103,25 +168,49 @@ export default function LessonVideoPlayer(props) {
 		video.current.playAsync();
 		// console.log("<<<<<<<<<<<<<<<", activeVideoUri);
 	};
-	const downloadVideo = async (qIndex) => {
-		const videoPlayerStatus = await video.current.getStatusAsync();
-		const videoTime = videoPlayerStatus.positionMillis;
-		// setvideoCurrentPosition(videoPlayerStatus.positionMillis);
 
-		console.log('video status positionMillis ', videoTime);
+	async function downloadVideo(index) {
+		// setButtonTitle('Downloading');
+		console.log('Downloading');
+		console.log(lsnid);
+		setDownload((prev) => ({
+			...prev,
+			['quality']: videoQualities2[index],
+			['on']: true,
+		}));
 
-		setactiveVideoUri(uris[qIndex]);
-		if (qIndex === 0) {
-			setqualityButtonColor(['', 'gray', 'gray']);
-		} else if (qIndex === 1) {
-			setqualityButtonColor(['gray', '', 'gray']);
-		} else {
-			setqualityButtonColor(['gray', 'gray', '']);
+		const callback = (downloadProgress) => {
+			setTotalSize(formatBytes(downloadProgress.totalBytesExpectedToWrite));
+
+			var progress =
+				downloadProgress.totalBytesWritten /
+				downloadProgress.totalBytesExpectedToWrite;
+			progress = progress.toFixed(2) * 100;
+			setProgressValue(progress.toFixed(0));
+		};
+
+		const downloadResumable = FileSystem.createDownloadResumable(
+			uris[2 + index],
+			FileSystem.documentDirectory +
+				lsnid +
+				'_' +
+				videoQualities2[index] +
+				'.mp4',
+			{},
+			callback
+		);
+
+		try {
+			const { uri } = await downloadResumable.downloadAsync();
+			console.log('Finished downloading to ', uri);
+			setDownload((prev) => ({ ...prev, ['on']: false }));
+			setDownloadstatus((prev) => ({ ...prev, [`status${index + 1}`]: true }));
+
+			// setButtonTitle('Downloaded');
+		} catch (e) {
+			console.error(e);
 		}
-		video.current.setPositionAsync(videoTime);
-		video.current.playAsync();
-		// console.log("<<<<<<<<<<<<<<<", activeVideoUri);
-	};
+	}
 
 	const changeSpeedAndColorHandler = (bIndex, vs) => {
 		video.current.playAsync();
@@ -324,25 +413,46 @@ export default function LessonVideoPlayer(props) {
 							<Text>Close</Text>
 						</Button>
 					</View>
-					<Dialog.Title style={{}}>Qualities</Dialog.Title>
-					<Dialog.Content>
-						<View style={styles.buttons}>
-							{videoQualities2.map((Quality, qIndex) => (
-								<View style={styles.speedButtonsList} key={Quality}>
-									<Button
-										color={qualityButtonColor[qIndex]}
-										title={Quality.toString()}
-										mode="contained"
-										onPress={() => {
-											downloadVideo(qIndex);
-										}}
-									>
-										{Quality}
-									</Button>
+					{download.on ? (
+						<>
+							<Dialog.Title style={{}}>
+								Downloading {download.quality}
+							</Dialog.Title>
+							<Dialog.Content>
+								<View style={styles.buttons}>
+									<Text> Size: {totalSize} </Text>
+									<Text>Progress: {progressValue} %</Text>
 								</View>
-							))}
-						</View>
-					</Dialog.Content>
+							</Dialog.Content>
+						</>
+					) : (
+						<>
+							<Dialog.Title style={{}}>Qualities</Dialog.Title>
+							<Dialog.Content>
+								<View style={styles.buttons}>
+									{videoQualities2.map((Quality, qIndex) => (
+										<View style={styles.speedButtonsList} key={Quality}>
+											<Button
+												color={
+													downloadstatus[`status${qIndex + 1}`]
+														? 'green'
+														: 'red'
+												}
+												disabled={downloadstatus[`status${qIndex + 1}`]}
+												title={Quality.toString()}
+												mode="contained"
+												onPress={() => {
+													downloadVideo(qIndex);
+												}}
+											>
+												{Quality}
+											</Button>
+										</View>
+									))}
+								</View>
+							</Dialog.Content>
+						</>
+					)}
 				</Dialog>
 			</Portal>
 		</View>

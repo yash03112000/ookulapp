@@ -1417,11 +1417,6 @@
     sudo-prompt "^9.0.0"
     wcwidth "^1.0.1"
 
-"@react-native-google-signin/google-signin@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@react-native-google-signin/google-signin/-/google-signin-7.0.1.tgz#a03f1a3e43ddb1bb092679bfdd6e38ff6ed819a1"
-  integrity sha512-iG1OkFx1ohSupofWnlbV+Re74L2HF823SOL1KNl1gGDiVxzNKJTZm/wuaPuujzci4kr8GuwR9PRgxLShiAZwlg==
-
 "@react-native/assets@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@react-native/assets/-/assets-1.0.0.tgz#c6f9bf63d274bafc8e970628de24986b30a55c8e"
@@ -2702,7 +2697,7 @@ expo-error-recovery@~3.0.3:
   dependencies:
     expo-modules-core "~0.4.4"
 
-expo-file-system@~13.0.3:
+expo-file-system@^13.0.3, expo-file-system@~13.0.3:
   version "13.0.3"
   resolved "https://registry.yarnpkg.com/expo-file-system/-/expo-file-system-13.0.3.tgz#f8b3c47e0e7ecfd767043ed4c0aba6b207367678"
   integrity sha512-i65brB1Nd0upWigXMXrN4YSvj5cP77tB4hNCXoWYVaqRKpUnVlEku2FjQ/xVfIWLJMYrFHHC0Kgz/OKsNzQTpg==
@@ -2718,14 +2713,6 @@ expo-font@~10.0.3:
   dependencies:
     expo-modules-core "~0.4.4"
     fontfaceobserver "^2.1.0"
-
-expo-google-sign-in@^10.0.3:
-  version "10.0.3"
-  resolved "https://registry.yarnpkg.com/expo-google-sign-in/-/expo-google-sign-in-10.0.3.tgz#3b2ef6de8bf119802225ef1f63151bb77df0621a"
-  integrity sha512-hooZHs2UpbOrwtwsgpU/i1Ic06tizx+K8GLbL0lKuLh+Cos53vSYP5HQEZs/2sy2p897XwdEX4ADj+ZyKIdFJw==
-  dependencies:
-    expo-modules-core "~0.4.4"
-    invariant "^2.2.4"
 
 expo-json-utils@~0.2.0:
   version "0.2.0"
@@ -2772,6 +2759,13 @@ expo-modules-core@~0.4.4, expo-modules-core@~0.4.6, expo-modules-core@~0.4.7, ex
   dependencies:
     compare-versions "^3.4.0"
     invariant "^2.2.4"
+
+expo-network@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/expo-network/-/expo-network-4.0.3.tgz#21d7317b004ae8d1b16b56fd60bc3eca377198e3"
+  integrity sha512-9MBxNcaN2O2YinJa1UMNIoCaQkDA74roMLF1Gv/VsfysCd36qHTDH0m3mNUb2NNWAd+5b8O91Q6PLRGz1AJtog==
+  dependencies:
+    expo-modules-core "~0.4.4"
 
 expo-random@^12.0.1:
   version "12.0.1"

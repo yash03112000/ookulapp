@@ -26,6 +26,7 @@ export const CourseSingle = (props) => {
 	const [lessonsOfSection, setlessonsOfSection] = useState({});
 	const [lessonPlayingStatus, setlessonPlayingStatus] = useState({});
 	const [activeUris, setactiveUris] = useState();
+	const [lsndet, setlsndet] = useState('');
 
 	useEffect(() => {
 		initialRunFunction(courseId);
@@ -33,22 +34,23 @@ export const CourseSingle = (props) => {
 			cleanupFunction();
 		};
 	}, [courseId]);
-
-  console.log(activeUris)
+	// console.log(activeUris);
 
 	const initialRunFunction = async (courseId) => {
-		// console.log("Message from initialRunFunction");
+		console.log('Message from initialRunFunction');
 		const sectionsArray = await getSectionList(courseId);
 		setsections(sectionsArray);
 		sectionsArray.forEach(async (section, sIndex) => {
 			//   console.log("section", section);
 			const lessonsArray = await getLessonList(section.section_id);
-			// console.log('lessonsArray', lessonsArray[0]);
+			console.log('lessonsArray', lessonsArray[0]);
 			setlessonsOfSection((oldV) => ({
 				...oldV,
 				[section.section_id]: lessonsArray,
 			}));
 			if (sIndex === 0) {
+				// console.log('runned');
+				setlsndet(lessonsArray[0].ID);
 				setactiveUris([
 					lessonsArray[0].video_hd || '',
 					lessonsArray[0].video_sd_h || '',
@@ -62,8 +64,8 @@ export const CourseSingle = (props) => {
 					...oldV,
 					[lessonsArray[0].ID]: true,
 				}));
+				setloading(false);
 			}
-			setloading(false);
 			//   console.log("lessonsArray", lessonsArray);
 		});
 	};
@@ -75,6 +77,7 @@ export const CourseSingle = (props) => {
 
 	const lessonClickedHandler = (lsn) => {
 		const lsnID = lsn.ID;
+		// console.log(lsn);
 		// console.log("clicked", lsn);
 		let lessonPD = lessonPlayingStatus;
 		Object.keys(lessonPD).forEach((v) => (lessonPD[v] = false));
@@ -82,6 +85,7 @@ export const CourseSingle = (props) => {
 		setlessonPlayingStatus((oldV) => ({ ...oldV, [lsnID]: true }));
 		// console.log("changed LessonPD", lessonPlayingStatus);
 		console.log('changing uris');
+		setlsndet(lsnID);
 		setactiveUris([
 			lsn.video_hd,
 			lsn.video_sd_h,
@@ -136,6 +140,7 @@ export const CourseSingle = (props) => {
 							uris={{
 								uris: activeUris,
 							}}
+							lsnid={lsndet}
 						/>
 					) : (
 						<View
