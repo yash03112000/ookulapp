@@ -22,7 +22,7 @@ const redirectUri = AuthSession.makeRedirectUri({
 	useProxy,
 });
 
-console.log(GOOGLE_CLIENT_ID);
+// console.log(GOOGLE_CLIENT_ID);
 WebBrowser.maybeCompleteAuthSession();
 
 export const SignInScreen = (props) => {
@@ -47,11 +47,11 @@ export const SignInScreen = (props) => {
 					// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJJRCI6NTk0LCJlbWFpbCI6InZpcG5rckBnbWFpbC5jb20iLCJuYW1lIjoidmlwaW4ga3VtYXIiLCJpYXQiOjE2MzU1MjI2Mzd9.XSoKcC_KnkuLXoff3BHsZItI8AzpM4N-y2wjTG8rdXI"
 				);
 				dispatch(loginSuccessUpdate());
-				console.log(
-					'userDataFromBackEnd.data.isUserInDB<<',
-					userDataFromBackEnd.data.isUserInDB,
-					userDataFromBackEnd.data.jwtToken
-				);
+				// console.log(
+				// 	'userDataFromBackEnd.data.isUserInDB<<',
+				// 	userDataFromBackEnd.data.isUserInDB,
+				// 	userDataFromBackEnd.data.jwtToken
+				// );
 				// console.log("jwt token received from backend", UserDataFromBackEnd.data);
 			})
 			.catch((e) => {

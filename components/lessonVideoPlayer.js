@@ -93,6 +93,32 @@ export default function LessonVideoPlayer(props) {
 	};
 
 	const checkFocused = useIsFocused();
+	const orientationCalculation = (gamma, beta) => {
+		let ABSOLUTE_GAMMA = Math.abs(gamma);
+		let ABSOLUTE_BETA = Math.abs(beta);
+		let isGammaNegative = Math.sign(gamma) == '-1';
+		let orientation = 0;
+
+		if (ABSOLUTE_GAMMA <= 0.04 && ABSOLUTE_BETA <= 0.24) {
+			//Portrait mode, on a flat surface.
+			orientation = 0;
+		} else if (
+			(ABSOLUTE_GAMMA <= 1.0 || ABSOLUTE_GAMMA >= 2.3) &&
+			ABSOLUTE_BETA >= 0.5
+		) {
+			//General Portrait mode, accounting for forward and back tilt on the top of the phone.
+			orientation = 0;
+		} else {
+			if (isGammaNegative) {
+				//Landscape mode with the top of the phone to the left.
+				orientation = -90;
+			} else {
+				//Landscape mode with the top of the phone to the right.
+				orientation = 90;
+			}
+		}
+		return orientation;
+	};
 
 	React.useEffect(async () => {
 		if (!checkFocused) {
@@ -102,16 +128,24 @@ export default function LessonVideoPlayer(props) {
 		// console.log(a)
 		function startListingOriantation() {
 			DeviceMotion.addListener((motion1) => {
-				setDeviceOriantation(motion1.orientation);
+				// setDeviceOriantation(motion1.orientation);
 				// console.log(motion1.orientation);
+				if (motion1.rotation) {
+					const orientation = orientationCalculation(
+						Number(motion1.rotation.gamma).toFixed(2),
+						Number(motion1.rotation.beta).toFixed(2)
+					);
+					console.log(orientation);
+					setDeviceOriantation(orientation);
+				}
 			});
 		}
 		startListingOriantation();
 		return function cleanup() {
 			DeviceMotion.removeAllListeners();
-			// console.log("reading stop at ", deviceOriantation, "deg");
+			// console.log('reading stop at ', deviceOriantation, 'deg');
 		};
-	});
+	}, []);
 
 	function formatBytes(bytes, decimals = 2) {
 		if (bytes === 0) return '0 Bytes';
@@ -472,11 +506,13 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		width: XX,
 		height: 300,
+		backgroundColor: 'red',
 	},
 	videoLandscape: {
 		alignSelf: 'center',
 		width: YY,
 		height: 300,
+		backgroundColor: 'green',
 	},
 	buttons: {
 		display: 'flex',
