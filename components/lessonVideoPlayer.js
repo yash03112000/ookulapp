@@ -6,6 +6,8 @@ import { Ionicons } from 'react-native-vector-icons';
 import { DeviceMotion } from 'expo-sensors';
 import { useIsFocused } from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system';
+import * as ScreenOrientation from 'expo-screen-orientation';
+import * as SecureStore from 'expo-secure-store';
 
 export default function LessonVideoPlayer(props) {
 	const [activeVideoUri, setactiveVideoUri] = React.useState('');
@@ -40,8 +42,10 @@ export default function LessonVideoPlayer(props) {
 		status2: false,
 	});
 
+	// console.log(props.lsndet);
+
 	const uris = props.uris.uris;
-	const lsnid = props.lsnid;
+	const lsnid = props.lsndet.ID;
 
 	const video = useRef(null);
 	// console.log(props);
@@ -119,33 +123,51 @@ export default function LessonVideoPlayer(props) {
 		}
 		return orientation;
 	};
+	// console.log(ScreenOrientation.OrientationLock);
 
-	React.useEffect(async () => {
-		if (!checkFocused) {
-			video.current.pauseAsync();
-		}
-		const a = await DeviceMotion.isAvailableAsync();
-		// console.log(a)
-		function startListingOriantation() {
-			DeviceMotion.addListener((motion1) => {
-				// setDeviceOriantation(motion1.orientation);
-				// console.log(motion1.orientation);
-				if (motion1.rotation) {
-					const orientation = orientationCalculation(
-						Number(motion1.rotation.gamma).toFixed(2),
-						Number(motion1.rotation.beta).toFixed(2)
-					);
-					console.log(orientation);
-					setDeviceOriantation(orientation);
-				}
-			});
-		}
-		startListingOriantation();
-		return function cleanup() {
-			DeviceMotion.removeAllListeners();
-			// console.log('reading stop at ', deviceOriantation, 'deg');
-		};
-	}, []);
+	// React.useEffect(async () => {
+	// 	if (!checkFocused) {
+	// 		if (video.current) video.current.pauseAsync();
+	// 	}
+	// 	const a = await DeviceMotion.isAvailableAsync();
+	// 	// console.log(a)
+	// 	function startListingOriantation() {
+	// 		DeviceMotion.addListener(async (motion1) => {
+	// 			// setDeviceOriantation(motion1.orientation);
+	// 			// console.log(motion1.orientation);
+	// 			if (motion1.rotation) {
+	// 				const orientation = orientationCalculation(
+	// 					Number(motion1.rotation.gamma).toFixed(2),
+	// 					Number(motion1.rotation.beta).toFixed(2)
+	// 				);
+	// 				// console.log(orientation);
+	// 				// setDeviceOriantation(orientation);
+	// 				if (orientation === 90) {
+	// 					await ScreenOrientation.lockAsync(
+	// 						ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
+	// 					);
+	// 					if (video.current) await video.current.presentFullscreenPlayer();
+	// 				} else if (orientation === -90) {
+	// 					await ScreenOrientation.lockAsync(
+	// 						ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT
+	// 					);
+	// 					if (video.current) await video.current.presentFullscreenPlayer();
+	// 				} else {
+	// 					await ScreenOrientation.lockAsync(
+	// 						ScreenOrientation.OrientationLock.PORTRAIT
+	// 					);
+	// 					if (video.current) await video.current.dismissFullscreenPlayer();
+	// 				}
+	// 			}
+	// 		});
+	// 	}
+	// 	startListingOriantation();
+	// 	DeviceMotion.setUpdateInterval(2000);
+	// 	return function cleanup() {
+	// 		DeviceMotion.removeAllListeners();
+	// 		// console.log('reading stop at ', deviceOriantation, 'deg');
+	// 	};
+	// }, []);
 
 	function formatBytes(bytes, decimals = 2) {
 		if (bytes === 0) return '0 Bytes';
@@ -165,17 +187,23 @@ export default function LessonVideoPlayer(props) {
 	const iconcolor = 'white';
 	const iconsize = 25;
 
-	const screenChangeStatusHandler = (screendata) => {
+	const screenChangeStatusHandler = async (screendata) => {
 		console.log(' screen', screendata.fullscreenUpdate);
 		const screenState = screendata.fullscreenUpdate;
 		if (screenState === Video.FULLSCREEN_UPDATE_PLAYER_WILL_PRESENT) {
 			console.log('full Screen started');
+			await ScreenOrientation.lockAsync(
+				ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
+			);
 		}
 		if (screenState === Video.FULLSCREEN_UPDATE_PLAYER_DID_PRESENT) {
 			console.log('full Screen done');
 		}
 		if (screenState === Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS) {
 			console.log('full Screen exit-started');
+			await ScreenOrientation.lockAsync(
+				ScreenOrientation.OrientationLock.PORTRAIT
+			);
 		}
 		if (screenState === Video.FULLSCREEN_UPDATE_PLAYER_DID_DISMISS) {
 			console.log('full Screen exit-done');
@@ -239,6 +267,26 @@ export default function LessonVideoPlayer(props) {
 			console.log('Finished downloading to ', uri);
 			setDownload((prev) => ({ ...prev, ['on']: false }));
 			setDownloadstatus((prev) => ({ ...prev, [`status${index + 1}`]: true }));
+			var downlist = await SecureStore.getItemAsync('downlist');
+			downlist = JSON.parse(downlist);
+			data = props.lsndet;
+			data['courseTitle'] = props.courseTitle;
+			data['courseId'] = props.courseId;
+			console.log(data);
+			if (downlist) {
+				if (downlist.filter((e) => e.ID === data.ID).length > 0) {
+					console.log('Already In downlist');
+				} else {
+					// console.log(data);
+					downlist.push(data);
+					await SecureStore.setItemAsync('downlist', JSON.stringify(downlist));
+				}
+			} else {
+				// console.log(data);
+				downlist = [];
+				downlist.push(data);
+				await SecureStore.setItemAsync('downlist', JSON.stringify(downlist));
+			}
 
 			// setButtonTitle('Downloaded');
 		} catch (e) {
@@ -354,9 +402,7 @@ export default function LessonVideoPlayer(props) {
 		<View style={styles.container}>
 			<Video
 				ref={video}
-				style={
-					deviceOriantation === 0 ? styles.videoPotrate : styles.videoLandscape
-				}
+				style={styles.videoPotrate}
 				source={{ uri: activeVideoUri }}
 				useNativeControls
 				resizeMode="contain"
@@ -506,13 +552,13 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		width: XX,
 		height: 300,
-		backgroundColor: 'red',
+		// backgroundColor: 'red',
 	},
 	videoLandscape: {
 		alignSelf: 'center',
 		width: YY,
 		height: 300,
-		backgroundColor: 'green',
+		// backgroundColor: 'green',
 	},
 	buttons: {
 		display: 'flex',

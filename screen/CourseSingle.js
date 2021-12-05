@@ -16,8 +16,20 @@ import LessonVideoPlayer from '../components/lessonVideoPlayer';
  * @function CourseSingle
  **/
 export const CourseSingle = (props) => {
-	const courseId = props.route.params.ID;
-	const courseItitle = props.route.params.post_title || 'Course Title';
+	var courseId = props.route.params.ID;
+	var courseItitle = props.route.params.post_title || 'Course Title';
+	// console.log(props.route.params);
+
+	if (props.route.params.from == 'Downloads') {
+		// console.log('ajeeeb');
+		courseId = props.route.params.courseId;
+		courseItitle = props.route.params.courseTitle || 'Course Title';
+	} else {
+		courseId = props.route.params.ID;
+		courseItitle = props.route.params.post_title || 'Course Title';
+	}
+	// console.log(courseId);
+	// console.log(courseItitle);
 	//   const courseId = 26535;
 	//   const courseItitle = "Course Title";
 
@@ -26,7 +38,7 @@ export const CourseSingle = (props) => {
 	const [lessonsOfSection, setlessonsOfSection] = useState({});
 	const [lessonPlayingStatus, setlessonPlayingStatus] = useState({});
 	const [activeUris, setactiveUris] = useState();
-	const [lsndet, setlsndet] = useState('');
+	const [lsndet, setlsndet] = useState({});
 
 	useEffect(() => {
 		initialRunFunction(courseId);
@@ -43,14 +55,18 @@ export const CourseSingle = (props) => {
 		sectionsArray.forEach(async (section, sIndex) => {
 			//   console.log("section", section);
 			const lessonsArray = await getLessonList(section.section_id);
-			console.log('lessonsArray', lessonsArray[0]);
+			// console.log('lessonsArray', lessonsArray[0]);
 			setlessonsOfSection((oldV) => ({
 				...oldV,
 				[section.section_id]: lessonsArray,
 			}));
-			if (sIndex === 0) {
+
+			if (props.route.params.from == 'Downloads') {
+				lessonClickedHandler(props.route.params);
+				setloading(false);
+			} else if (sIndex === 0) {
 				// console.log('runned');
-				setlsndet(lessonsArray[0].ID);
+				setlsndet(lessonsArray[0]);
 				setactiveUris([
 					lessonsArray[0].video_hd || '',
 					lessonsArray[0].video_sd_h || '',
@@ -85,7 +101,7 @@ export const CourseSingle = (props) => {
 		setlessonPlayingStatus((oldV) => ({ ...oldV, [lsnID]: true }));
 		// console.log("changed LessonPD", lessonPlayingStatus);
 		console.log('changing uris');
-		setlsndet(lsnID);
+		setlsndet(lsn);
 		setactiveUris([
 			lsn.video_hd,
 			lsn.video_sd_h,
@@ -140,7 +156,9 @@ export const CourseSingle = (props) => {
 							uris={{
 								uris: activeUris,
 							}}
-							lsnid={lsndet}
+							lsndet={lsndet}
+							courseTitle={courseItitle}
+							courseId={courseId}
 						/>
 					) : (
 						<View
