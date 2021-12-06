@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, Dimensions, Text } from 'react-native';
 import { Video, AVPlaybackStatus } from 'expo-av';
 import { Portal, Dialog, Button } from 'react-native-paper';
@@ -8,6 +8,7 @@ import { useIsFocused } from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import * as SecureStore from 'expo-secure-store';
+import { useSelector, useDispatch } from 'react-redux';
 
 export default function LessonVideoPlayer(props) {
 	const [activeVideoUri, setactiveVideoUri] = React.useState('');
@@ -41,6 +42,7 @@ export default function LessonVideoPlayer(props) {
 		status1: false,
 		status2: false,
 	});
+	const netStatus = useSelector((state) => state.auth.netStatus);
 
 	// console.log(props.lsndet);
 
@@ -49,6 +51,31 @@ export default function LessonVideoPlayer(props) {
 
 	const video = useRef(null);
 	// console.log(props);
+	const changeQualityOffline = async (qIndex) => {
+		// const videoPlayerStatus = await video.current.getStatusAsync();
+		// const videoTime = videoPlayerStatus.positionMillis;
+		// // setvideoCurrentPosition(videoPlayerStatus.positionMillis);
+
+		// console.log('video status positionMillis ', videoTime);
+		setQuality(qIndex);
+
+		// setactiveVideoUri(uris[qIndex]);
+		if (qIndex === 0) {
+			setqualityButtonColor(['', 'gray', 'gray']);
+		} else if (qIndex === 1) {
+			setqualityButtonColor(['gray', '', 'gray']);
+		} else {
+			setqualityButtonColor(['gray', 'gray', '']);
+		}
+		// video.current.setPositionAsync(videoTime);
+		// video.current.playAsync();
+		// console.log("<<<<<<<<<<<<<<<", activeVideoUri);
+	};
+
+	useMemo(() => {
+		if (props.downloadQuality == 'Low') changeQualityOffline(2);
+		else if (props.downloadQuality == 'SD') changeQualityOffline(1);
+	}, []);
 
 	useEffect(() => {
 		checkquality();
@@ -71,7 +98,15 @@ export default function LessonVideoPlayer(props) {
 		const file = await FileSystem.getInfoAsync(a, {});
 		// console.log(file.exists);
 		if (file.exists) setactiveVideoUri(a);
-		else setactiveVideoUri(uris[1]);
+		else {
+			if (netStatus) {
+				setactiveVideoUri(uris[1]);
+			} else {
+				alert(
+					'This action is not offline mode. Please Try Downloaded qualities only'
+				);
+			}
+		}
 		setDownload({ quality: '', on: false });
 	};
 	const checkdownload = async () => {
@@ -97,32 +132,32 @@ export default function LessonVideoPlayer(props) {
 	};
 
 	const checkFocused = useIsFocused();
-	const orientationCalculation = (gamma, beta) => {
-		let ABSOLUTE_GAMMA = Math.abs(gamma);
-		let ABSOLUTE_BETA = Math.abs(beta);
-		let isGammaNegative = Math.sign(gamma) == '-1';
-		let orientation = 0;
+	// const orientationCalculation = (gamma, beta) => {
+	// 	let ABSOLUTE_GAMMA = Math.abs(gamma);
+	// 	let ABSOLUTE_BETA = Math.abs(beta);
+	// 	let isGammaNegative = Math.sign(gamma) == '-1';
+	// 	let orientation = 0;
 
-		if (ABSOLUTE_GAMMA <= 0.04 && ABSOLUTE_BETA <= 0.24) {
-			//Portrait mode, on a flat surface.
-			orientation = 0;
-		} else if (
-			(ABSOLUTE_GAMMA <= 1.0 || ABSOLUTE_GAMMA >= 2.3) &&
-			ABSOLUTE_BETA >= 0.5
-		) {
-			//General Portrait mode, accounting for forward and back tilt on the top of the phone.
-			orientation = 0;
-		} else {
-			if (isGammaNegative) {
-				//Landscape mode with the top of the phone to the left.
-				orientation = -90;
-			} else {
-				//Landscape mode with the top of the phone to the right.
-				orientation = 90;
-			}
-		}
-		return orientation;
-	};
+	// 	if (ABSOLUTE_GAMMA <= 0.04 && ABSOLUTE_BETA <= 0.24) {
+	// 		//Portrait mode, on a flat surface.
+	// 		orientation = 0;
+	// 	} else if (
+	// 		(ABSOLUTE_GAMMA <= 1.0 || ABSOLUTE_GAMMA >= 2.3) &&
+	// 		ABSOLUTE_BETA >= 0.5
+	// 	) {
+	// 		//General Portrait mode, accounting for forward and back tilt on the top of the phone.
+	// 		orientation = 0;
+	// 	} else {
+	// 		if (isGammaNegative) {
+	// 			//Landscape mode with the top of the phone to the left.
+	// 			orientation = -90;
+	// 		} else {
+	// 			//Landscape mode with the top of the phone to the right.
+	// 			orientation = 90;
+	// 		}
+	// 	}
+	// 	return orientation;
+	// };
 	// console.log(ScreenOrientation.OrientationLock);
 
 	// React.useEffect(async () => {
@@ -272,6 +307,7 @@ export default function LessonVideoPlayer(props) {
 			data = props.lsndet;
 			data['courseTitle'] = props.courseTitle;
 			data['courseId'] = props.courseId;
+			data['downloadQuality'] = videoQualities2[index];
 			console.log(data);
 			if (downlist) {
 				if (downlist.filter((e) => e.ID === data.ID).length > 0) {
@@ -398,6 +434,8 @@ export default function LessonVideoPlayer(props) {
 			]);
 		}
 	};
+
+	// console.log(activeVideoUri);
 	return (
 		<View style={styles.container}>
 			<Video

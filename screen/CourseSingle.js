@@ -10,6 +10,7 @@ import {
 import { getLessonList, getSectionList } from '../axios/learnpress';
 import axiosInstance from '../axios/orgin';
 import LessonVideoPlayer from '../components/lessonVideoPlayer';
+import { useSelector, useDispatch } from 'react-redux';
 
 /**
  * @author
@@ -18,12 +19,14 @@ import LessonVideoPlayer from '../components/lessonVideoPlayer';
 export const CourseSingle = (props) => {
 	var courseId = props.route.params.ID;
 	var courseItitle = props.route.params.post_title || 'Course Title';
+	var downloadQuality = '';
 	// console.log(props.route.params);
 
 	if (props.route.params.from == 'Downloads') {
 		// console.log('ajeeeb');
 		courseId = props.route.params.courseId;
 		courseItitle = props.route.params.courseTitle || 'Course Title';
+		downloadQuality = props.route.params.downloadQuality;
 	} else {
 		courseId = props.route.params.ID;
 		courseItitle = props.route.params.post_title || 'Course Title';
@@ -39,6 +42,7 @@ export const CourseSingle = (props) => {
 	const [lessonPlayingStatus, setlessonPlayingStatus] = useState({});
 	const [activeUris, setactiveUris] = useState();
 	const [lsndet, setlsndet] = useState({});
+	const netStatus = useSelector((state) => state.auth.netStatus);
 
 	useEffect(() => {
 		initialRunFunction(courseId);
@@ -159,6 +163,7 @@ export const CourseSingle = (props) => {
 							lsndet={lsndet}
 							courseTitle={courseItitle}
 							courseId={courseId}
+							downloadQuality={downloadQuality}
 						/>
 					) : (
 						<View
@@ -179,38 +184,44 @@ export const CourseSingle = (props) => {
 					<Text style={styles.courseTitle}>{courseItitle}</Text>
 				</View>
 			)}
-			<View style={styles.totalLessonContainer}>
-				<ScrollView>
-					<View>
-						{loading ? (
-							<ActivityIndicator size="large" color="#0000ff" />
-						) : (
-							<View style={styles.sectionContainer}>
-								{0 ? (
-									<View>
-										<Text>dfghjk</Text>
-									</View>
-								) : (
-									<View>
-										{sections.map((sec) => (
-											<View key={sec.section_id.toString()}>
-												<Text style={styles.sectionTitle}>
-													{' '}
-													{sec.section_name} {' #'}
-													{sec.section_id.toString()}
-												</Text>
-												<View>
-													<LessonsView sectionId={sec.section_id} />
+			{netStatus ? (
+				<View style={styles.totalLessonContainer}>
+					<ScrollView>
+						<View>
+							{loading ? (
+								<ActivityIndicator size="large" color="#0000ff" />
+							) : (
+								<View style={styles.sectionContainer}>
+									{0 ? (
+										<View>
+											<Text>dfghjk</Text>
+										</View>
+									) : (
+										<View>
+											{sections.map((sec) => (
+												<View key={sec.section_id.toString()}>
+													<Text style={styles.sectionTitle}>
+														{' '}
+														{sec.section_name} {' #'}
+														{sec.section_id.toString()}
+													</Text>
+													<View>
+														<LessonsView sectionId={sec.section_id} />
+													</View>
 												</View>
-											</View>
-										))}
-									</View>
-								)}
-							</View>
-						)}
-					</View>
-				</ScrollView>
-			</View>
+											))}
+										</View>
+									)}
+								</View>
+							)}
+						</View>
+					</ScrollView>
+				</View>
+			) : (
+				<>
+					<Text>Feature Not Available in Offline Mode</Text>
+				</>
+			)}
 		</View>
 	);
 };

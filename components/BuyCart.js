@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import { Button, List } from 'react-native-paper';
 import { CourseAccess } from '../components/CourseAccess';
-
 import axiosInstance from '../axios/orgin';
 import * as SecureStore from 'expo-secure-store';
 
@@ -10,20 +9,18 @@ import * as SecureStore from 'expo-secure-store';
  * @author
  * @function CourseDetails
  **/
-export const BuyCart = ({ navigation, data }) => {
+export const BuyCart = ({ navigation, data, enrolled, cart }) => {
 	// console.log("wpcoursemeta", wpCourseMeta);
 
 	const [status, setStatus] = useState('');
 
 	useEffect(async () => {
 		try {
-			const jwtUserToken = await SecureStore.getItemAsync('token');
-			const isStudentEnrolled = await isCourseEnrolled(jwtUserToken, data.ID);
-			if (isStudentEnrolled) setStatus('done');
+			if (enrolled) setStatus('done');
 			else {
-				var cart = await SecureStore.getItemAsync('cart');
-				// console.log(cart);
-				cart = JSON.parse(cart);
+				// var cart = await SecureStore.getItemAsync('cart');
+				// // console.log(cart);
+				// cart = JSON.parse(cart);
 				// console.log(cart);
 
 				if (cart) {
@@ -42,7 +39,7 @@ export const BuyCart = ({ navigation, data }) => {
 		} catch (e) {
 			console.log(e);
 		}
-	}, [data]);
+	}, []);
 
 	const enter = () => {
 		// console.log("start of single course screen", pageScreen);
@@ -82,7 +79,7 @@ export const BuyCart = ({ navigation, data }) => {
 					cart.push(data);
 					await SecureStore.setItemAsync('cart', JSON.stringify(cart));
 					// setInCart(true);
-					setStatus(go);
+					setStatus('go');
 				}
 			} else {
 				// console.log(data);
@@ -90,7 +87,7 @@ export const BuyCart = ({ navigation, data }) => {
 				cart.push(data);
 				await SecureStore.setItemAsync('cart', JSON.stringify(cart));
 				// setInCart(true);
-				setStatus(go);
+				setStatus('go');
 			}
 		} catch (e) {
 			console.log(e);

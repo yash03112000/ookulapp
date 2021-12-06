@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Platform } from 'react-native';
 import {
 	ActivityIndicator,
 	Colors,
@@ -16,12 +16,24 @@ import axiosInstance from '../axios/orgin';
 import { useDispatch } from 'react-redux';
 import { loginSuccessUpdate } from '../reducers/authSlice';
 import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
+
+console.log(Constants.manifest?.android?.package);
+// console.log(Constants.manifest?.net.openid.appauth.RedirectUriReceiverActivity);
 
 const useProxy = false;
 const redirectUri = AuthSession.makeRedirectUri({
-	useProxy,
+	// useProxy,
+	native: Platform.select({
+		/**
+		 * Workaround for app appearing twice on "Open with" prompt.
+		 * https://forums.expo.dev/t/app-appears-twice-on-open-with-list-after-google-auth/55659
+		 */
+		android: `${Constants.manifest?.android?.package}.auth://`,
+		default: undefined,
+	}),
 });
-
+// console.log(redirectUri);
 // console.log(GOOGLE_CLIENT_ID);
 WebBrowser.maybeCompleteAuthSession();
 
@@ -60,6 +72,7 @@ export const SignInScreen = (props) => {
 	};
 
 	React.useEffect(async () => {
+		// console.log(response);
 		if (response?.type === 'success') {
 			const { authentication } = response;
 			// console.log(authentication);

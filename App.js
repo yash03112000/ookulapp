@@ -28,11 +28,13 @@ import {
 	// emailIdUpdate,
 	loginFailUpdate,
 	loginSuccessUpdate,
+	netUpdate,
 } from './reducers/authSlice';
 // import { jwtauthtoken } from "./config/devProduction";
 import * as Linking from 'expo-linking';
 import { Cart } from './screen/CartScreen';
 import * as SecureStore from 'expo-secure-store';
+import * as Network from 'expo-network';
 
 const prefix = Linking.makeUrl('/');
 
@@ -46,11 +48,11 @@ function HomeScreenComponents() {
 				// component={SingleCourseScreen}
 				options={{ headerShown: false }}
 			/>
-			<Stack.Screen
+			{/* <Stack.Screen
 				name="CourseSingle"
 				component={CourseSingle}
 				options={{ headerShown: false }}
-			/>
+			/> */}
 			<Stack.Screen
 				name="CourseDetails"
 				component={CourseDetails}
@@ -107,6 +109,7 @@ export const MyApp = () => {
 	const dispatch = useDispatch();
 	const isLoading = useSelector((state) => state.auth.loginLoading);
 	const isLoggedIn = useSelector((state) => state.auth.loginSuccess);
+	const netStatus = useSelector((state) => state.auth.netStatus);
 	// const isLoggedIn = true
 	// const isLoading = false
 	// console.log("is logged in<<", isLoggedIn);
@@ -130,11 +133,17 @@ export const MyApp = () => {
 
 	useEffect(async () => {
 		try {
-			const jwtUserToken = await SecureStore.getItemAsync('token');
-			if (jwtUserToken) {
-				dispatch(loginSuccessUpdate());
+			const status = await Network.getNetworkStateAsync();
+			if (status.isConnected) {
+				dispatch(netUpdate(true));
+				const jwtUserToken = await SecureStore.getItemAsync('token');
+				if (jwtUserToken) {
+					dispatch(loginSuccessUpdate());
+				} else {
+					dispatch(loginFailUpdate());
+				}
 			} else {
-				dispatch(loginFailUpdate);
+				dispatch(netUpdate(false));
 			}
 		} catch (error) {
 			console.log(error);
@@ -143,7 +152,6 @@ export const MyApp = () => {
 
 	return (
 		<NavigationContainer linking={linking}>
-			{/* <NavigationContainer> */}
 			{isLoggedIn ? (
 				<>
 					<Tab.Navigator
@@ -185,27 +193,41 @@ export const MyApp = () => {
 				</>
 			) : (
 				<>
-					{isLoading ? (
-						<Stack.Navigator>
-							<Stack.Screen
-								name="SplashScreen"
-								component={SplashScreen}
-								options={{ headerShown: false }}
-							/>
-						</Stack.Navigator>
+					{netStatus ? (
+						<>
+							{isLoading ? (
+								<Stack.Navigator>
+									<Stack.Screen
+										name="SplashScreen"
+										component={SplashScreen}
+										options={{ headerShown: false }}
+									/>
+								</Stack.Navigator>
+							) : (
+								<Stack.Navigator>
+									<Stack.Screen
+										name="SignIn"
+										component={SignInScreen}
+										options={{ headerShown: false }}
+									/>
+								</Stack.Navigator>
+							)}
+						</>
 					) : (
-						<Stack.Navigator>
-							<Stack.Screen
-								name="SignIn"
-								component={SignInScreen}
-								options={{ headerShown: false }}
-							/>
-							{/* <Stack.Screen
-                name="SignUp"
-                component={SignUpScreen}
-                options={{ headerShown: false }}
-              /> */}
-						</Stack.Navigator>
+						<>
+							<Stack.Navigator>
+								<Stack.Screen
+									name="Dowloads"
+									component={DownloadsScreen}
+									options={{ headerShown: true }}
+								/>
+								<Stack.Screen
+									name="CourseSingle"
+									component={CourseSingle}
+									options={{ headerShown: false }}
+								/>
+							</Stack.Navigator>
+						</>
 					)}
 				</>
 			)}

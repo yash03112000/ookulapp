@@ -6,7 +6,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 
 /**
@@ -18,6 +18,8 @@ export const DownloadsScreen = () => {
 	const [items, setItems] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const navigation = useNavigation();
+	const isFocused = useIsFocused();
+	// console.log(isFocused);
 
 	useEffect(async () => {
 		try {
@@ -28,7 +30,7 @@ export const DownloadsScreen = () => {
 		} catch (e) {
 			console.log(e);
 		}
-	}, []);
+	}, [isFocused]);
 	const { container } = styles;
 
 	return loading ? (

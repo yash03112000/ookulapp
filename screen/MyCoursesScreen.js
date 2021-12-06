@@ -14,16 +14,19 @@ import { Banner } from '../components/home/banner';
 import CourseCard from '../components/home/courseCard';
 import LessonVideoPlayer from '../components/lessonVideoPlayer';
 import * as SecureStore from 'expo-secure-store';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 
 export const MyCoursesScreen = ({ item: data, navigation }) => {
 	const [courses, setCourses] = useState([]);
 	const [load, setLoad] = useState(true);
 	const pageScreen = 'CourseSingle';
+	const isFocused = useIsFocused();
+
 	// console.log("navigation", navigation);
 
 	useEffect(() => {
 		initial();
-	}, []);
+	}, [isFocused]);
 
 	const initial = async () => {
 		setLoad(true);
