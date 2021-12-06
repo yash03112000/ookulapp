@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import Constants from 'expo-constants';
 import { TouchableHighlight } from 'react-native-gesture-handler';
@@ -57,6 +57,7 @@ const classes = StyleSheet.create({
 export default function CourseCard({ item: data, navigation, pageScreen }) {
 	// const router = useRouter();
 	// console.log("data", data);
+
 	const enter = () => {
 		// console.log("start of single course screen", pageScreen);
 
