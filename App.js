@@ -134,6 +134,7 @@ export const MyApp = () => {
 	useEffect(async () => {
 		try {
 			const status = await Network.getNetworkStateAsync();
+			// alert(status.isConnected);
 			if (status.isConnected) {
 				dispatch(netUpdate(true));
 				const jwtUserToken = await SecureStore.getItemAsync('token');
@@ -147,6 +148,12 @@ export const MyApp = () => {
 			}
 		} catch (error) {
 			console.log(error);
+			dispatch(netUpdate(false));
+			// if (error == 'ERR_NETWORK_NO_ACCESS_NETWORKINFO') {
+			// 	dispatch(netUpdate(false));
+			// } else {
+			// 	alert(error);
+			// }
 		}
 	}, []);
 
