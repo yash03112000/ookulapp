@@ -142,13 +142,14 @@ export const CourseSingle = (props) => {
 		} catch (error) {
 			return (
 				<View key={Math.random() + Math.random()}>
-					<Text>{'Loading...'}</Text>
+					<ActivityIndicator size="large" color="#0000ff" />
 				</View>
 			);
 		}
 	};
 
 	//   const { container } = styles;
+	console.log(activeUris);
 	return (
 		<View style={styles.main}>
 			{loading ? (

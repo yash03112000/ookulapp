@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Button, Dialog, Portal } from 'react-native-paper';
 import {
+	getCourse,
 	getLessonList,
 	getSectionList,
 	getStudentCourseList,
@@ -18,6 +19,7 @@ import {
 import axiosInstance from '../axios/orgin';
 import { CourseAccess } from '../components/CourseAccess';
 import LessonVideoPlayer from '../components/lessonVideoPlayer';
+import PDFDisplay from '../components/PDFDisplay';
 
 /**
  * @author
@@ -38,6 +40,7 @@ export const CourseDetails = (props) => {
 	const [courseAccessAlert, setcourseAccessAlert] = useState(false);
 	const [boughtByUser, setboughtByUser] = useState(false);
 	const [lsndet, setlsndet] = useState({});
+	const [course, setCourse] = useState({});
 
 	const lessonRef = useRef(null);
 
@@ -51,50 +54,69 @@ export const CourseDetails = (props) => {
 	const initialRunFunction = async (courseId) => {
 		// console.log("Message from initialRunFunction");
 
-		const jwtUserToken = await SecureStore.getItemAsync('token');
-		const isStudentEnrolled = await isCourseEnrolled(jwtUserToken, courseId);
-		setboughtByUser(isStudentEnrolled);
+		try {
+			const jwtUserToken = await SecureStore.getItemAsync('token');
+			const isStudentEnrolled = await isCourseEnrolled(jwtUserToken, courseId);
+			const course = await getCourse(courseId);
+			// console.log(course);
+			setboughtByUser(isStudentEnrolled);
+			setCourse(course);
 
-		// setcourseAccessAlert(isCourseEnrolled);
+			// setcourseAccessAlert(isCourseEnrolled);
 
-		console.log('isStudentEnrolled', isStudentEnrolled);
+			console.log('isStudentEnrolled', isStudentEnrolled);
 
-		const sectionsArray = await getSectionList(courseId);
-		setsections(sectionsArray);
-		sectionsArray.forEach(async (section, sIndex) => {
-			//   console.log("section", section);
-			const lessonsArray = await getLessonList(section.section_id);
-			//   console.log("lessonsArray", lessonsArray);
-			setlessonsOfSection((oldV) => ({
-				...oldV,
-				[section.section_id]: lessonsArray,
-			}));
-			if (sIndex === 0) {
-				console.log(sIndex);
-				setlsndet(lessonsArray[0]);
-
-				setactiveUris([
-					lessonsArray[0].video_hd || '',
-					lessonsArray[0].video_sd_h || '',
-					lessonsArray[0].video_sd_l || '',
-					lessonsArray[0].video_download_sd_m || '',
-					lessonsArray[0].video_download_sd_l || '',
-					lessonsArray[0].type || '',
-					lessonsArray[0].doc || '',
-				]);
-				setlessonPlayingStatus((oldV) => ({
+			const sectionsArray = await getSectionList(courseId);
+			setsections(sectionsArray);
+			sectionsArray.forEach(async (section, sIndex) => {
+				//   console.log("section", section)activeUr;
+				const lessonsArray = await getLessonList(section.section_id);
+				//   console.log("lessonsArray", lessonsArray);
+				setlessonsOfSection((oldV) => ({
 					...oldV,
-					[lessonsArray[0].ID]: true,
+					[section.section_id]: lessonsArray,
 				}));
-			}
-			setloading(false);
-			//   console.log("lessonsArray", lessonsArray);
-		});
+				if (sIndex === 0) {
+					console.log(sIndex);
+					setlsndet(lessonsArray[0]);
+
+					setactiveUris([
+						lessonsArray[0].video_hd || '',
+						lessonsArray[0].video_sd_h || '',
+						lessonsArray[0].video_sd_l || '',
+						lessonsArray[0].video_download_sd_m || '',
+						lessonsArray[0].video_download_sd_l || '',
+						lessonsArray[0].type || '',
+						lessonsArray[0].doc || '',
+					]);
+					setlessonPlayingStatus((oldV) => ({
+						...oldV,
+						[lessonsArray[0].ID]: true,
+					}));
+				}
+				// console.log(sIndex);
+				// console.log(sectionsArray.length);
+				if (sIndex === sectionsArray.length - 1) {
+					console.log('umm');
+					console.log(lessonsArray[0]);
+					setloading(false);
+				}
+
+				//   console.log("lessonsArray", lessonsArray);
+			});
+		} catch (e) {
+			console.log('ummm');
+			console.log(e);
+			// console.log(loading);
+			// console.log(activeUris);
+		}
 	};
+	// console.log(activeUris);
+	// console.log(loading);
 
 	const cleanupFunction = () => {
-		setloading(true);
 		console.log('Message from clianup Function');
+		setloading(true);
 	};
 
 	const lessonClickedHandler = (lsn) => {
@@ -149,7 +171,7 @@ export const CourseDetails = (props) => {
 		} catch (error) {
 			return (
 				<View key={Math.random() + Math.random()}>
-					<Text>{'Loading...'}</Text>
+					<ActivityIndicator size="large" color="#0000ff" />
 				</View>
 			);
 		}
@@ -182,11 +204,16 @@ export const CourseDetails = (props) => {
 									alignItems: 'center',
 								}}
 							>
-								<Text>
-									{activeUris[6] !== ''
-										? activeUris[6]
-										: 'Document will be added soon'}
-								</Text>
+								{activeUris[6] !== '' ? (
+									<PDFDisplay
+										src={activeUris[6]}
+										lsndet={lsndet}
+										courseTitle={courseItitle}
+										courseId={courseId}
+									/>
+								) : (
+									<Text>Document will be added soon</Text>
+								)}
 							</View>
 						)}
 
@@ -201,7 +228,9 @@ export const CourseDetails = (props) => {
 							<View style={styles.sectionContainer}>
 								{!boughtByUser ? (
 									<View>
-										<CourseAccess {...{ navigation: props.navigation }} />
+										<CourseAccess
+											{...{ navigation: props.navigation, course }}
+										/>
 									</View>
 								) : (
 									<View></View>
@@ -240,7 +269,7 @@ export const CourseDetails = (props) => {
 						<Text>Please buy and enroll the course to watch this lesson</Text>
 					</Dialog.Title>
 					<Dialog.Content>
-						<CourseAccess {...{ navigation: props.navigation }} />
+						<CourseAccess {...{ navigation: props.navigation, course }} />
 					</Dialog.Content>
 				</Dialog>
 			</Portal>

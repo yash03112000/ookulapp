@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import {
+	View,
+	Text,
+	StyleSheet,
+	ScrollView,
+	ActivityIndicator,
+} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import CourseCard from '../components/home/courseCard';
 import { useNavigation } from '@react-navigation/native';
@@ -26,8 +32,8 @@ export const Cart = (props) => {
 	}, []);
 
 	const billingHandler = () => {
-		navigation.navigate('Settings', {
-			screen: 'ProfileScreen',
+		navigation.navigate('Profile', {
+			screen: 'CheckoutScreen',
 		});
 	};
 	// console.log(items);
@@ -35,7 +41,7 @@ export const Cart = (props) => {
 	const { container } = styles;
 	return loading ? (
 		<View style={container}>
-			<Text>Loading....</Text>
+			<ActivityIndicator size="large" color="#0000ff" />
 		</View>
 	) : (
 		<View style={container}>

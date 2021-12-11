@@ -5,6 +5,7 @@ import {
 	ScrollView,
 	StyleSheet,
 	TouchableOpacity,
+	ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
@@ -35,7 +36,7 @@ export const DownloadsScreen = () => {
 
 	return loading ? (
 		<View style={container}>
-			<Text>Loading....</Text>
+			<ActivityIndicator size="large" color="#0000ff" />
 		</View>
 	) : (
 		<View style={container}>

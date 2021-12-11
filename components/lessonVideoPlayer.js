@@ -47,6 +47,7 @@ export default function LessonVideoPlayer(props) {
 	// console.log(props.lsndet);
 
 	const uris = props.uris.uris;
+	// console.log(uris);
 	const lsnid = props.lsndet.ID;
 
 	const video = useRef(null);
@@ -76,18 +77,22 @@ export default function LessonVideoPlayer(props) {
 		if (props.downloadQuality == 'Low') changeQualityOffline(2);
 		else if (props.downloadQuality == 'SD') changeQualityOffline(1);
 	}, []);
+	const checkFocused = useIsFocused();
+	// console.log(checkFocused);
 
 	useEffect(() => {
 		checkquality();
-	}, [uris, quality]);
+	}, [uris]);
 	useEffect(() => {
 		checkdownload();
 	}, [uris]);
-	// console.log(uris[1])
+	useEffect(() => {
+		if (!checkFocused) {
+			if (video.current) video.current.pauseAsync();
+		}
+	}, [checkFocused]);
 
-	// console.log(activeVideoUri);
-
-	const checkquality = async () => {
+	const checkquality = async (videoTime) => {
 		const a =
 			'file:///data/user/0/com.ookulapp/files/' +
 			lsnid +
@@ -107,6 +112,8 @@ export default function LessonVideoPlayer(props) {
 				);
 			}
 		}
+		video.current.setPositionAsync(videoTime);
+		video.current.playAsync();
 		setDownload({ quality: '', on: false });
 	};
 	const checkdownload = async () => {
@@ -131,7 +138,6 @@ export default function LessonVideoPlayer(props) {
 		setDownloadstatus({ status1, status2 });
 	};
 
-	const checkFocused = useIsFocused();
 	// const orientationCalculation = (gamma, beta) => {
 	// 	let ABSOLUTE_GAMMA = Math.abs(gamma);
 	// 	let ABSOLUTE_BETA = Math.abs(beta);
@@ -252,7 +258,6 @@ export default function LessonVideoPlayer(props) {
 
 		console.log('video status positionMillis ', videoTime);
 		setQuality(qIndex);
-
 		// setactiveVideoUri(uris[qIndex]);
 		if (qIndex === 0) {
 			setqualityButtonColor(['', 'gray', 'gray']);
@@ -261,8 +266,8 @@ export default function LessonVideoPlayer(props) {
 		} else {
 			setqualityButtonColor(['gray', 'gray', '']);
 		}
-		video.current.setPositionAsync(videoTime);
-		video.current.playAsync();
+		checkquality(videoTime);
+
 		// console.log("<<<<<<<<<<<<<<<", activeVideoUri);
 	};
 

@@ -4,15 +4,17 @@ import { Button, List } from 'react-native-paper';
 import { CourseAccess } from '../components/CourseAccess';
 import axiosInstance from '../axios/orgin';
 import * as SecureStore from 'expo-secure-store';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { cartUpdate } from '../reducers/authSlice';
 /**
  * @author
  * @function CourseDetails
  **/
-export const BuyCart = ({ navigation, data, enrolled, cart }) => {
+export const BuyCart = ({ navigation, data, enrolled, cart, pageScreen }) => {
 	// console.log("wpcoursemeta", wpCourseMeta);
 
 	const [status, setStatus] = useState('');
+	const dispatch = useDispatch();
 
 	useEffect(async () => {
 		try {
@@ -80,6 +82,7 @@ export const BuyCart = ({ navigation, data, enrolled, cart }) => {
 					await SecureStore.setItemAsync('cart', JSON.stringify(cart));
 					// setInCart(true);
 					setStatus('go');
+					dispatch(cartUpdate(cart.length));
 				}
 			} else {
 				// console.log(data);
@@ -88,12 +91,11 @@ export const BuyCart = ({ navigation, data, enrolled, cart }) => {
 				await SecureStore.setItemAsync('cart', JSON.stringify(cart));
 				// setInCart(true);
 				setStatus('go');
+				dispatch(cartUpdate(cart.length));
 			}
 		} catch (e) {
 			console.log(e);
 		}
-
-		//prepare detail to send razorpay
 	};
 
 	return (

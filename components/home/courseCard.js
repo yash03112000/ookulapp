@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
+import {
+	StyleSheet,
+	Text,
+	View,
+	Image,
+	Dimensions,
+	ActivityIndicator,
+} from 'react-native';
 import Constants from 'expo-constants';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { BuyCart } from '../BuyCart';
@@ -46,7 +53,7 @@ const classes = StyleSheet.create({
 		flexDirection: 'column',
 		justifyContent: 'space-around',
 		// backgroundColor: 'blue',
-		// height: 150,
+		height: 150,
 	},
 	pricediv: {
 		display: 'flex',
@@ -74,10 +81,10 @@ export default function CourseCard({
 	useEffect(async () => {
 		let flag = true;
 		if (pageScreen !== 'CourseDetails') {
-			console.log('hehe');
-			console.log(pageScreen);
+			// console.log('hehe');
+			// console.log(pageScreen);
 
-			setLoading(false);
+			if (flag) setLoading(false);
 		} else {
 			// console.log(flag);
 			const isStudentEnrolled = await isCourseEnrolled(token, data.ID);
@@ -98,7 +105,7 @@ export default function CourseCard({
 	return (
 		<>
 			{loading ? (
-				<Text>Loading...</Text>
+				<ActivityIndicator size="large" color="#0000ff" />
 			) : (
 				<View style={classes.head}>
 					<TouchableHighlight
@@ -152,19 +159,7 @@ export default function CourseCard({
 					</View>
 					{pageScreen === 'CourseDetails' && (
 						<View>
-							{data.wpCourseMeta._lp_sale_price.toString() !== '0' ? (
-								<BuyCart {...{ navigation, data, enrolled, cart }} />
-							) : (
-								<View style={{ margin: 2 }}>
-									<Button
-										// onPress={buyNowHandler}
-										mode="contained"
-										style={{ padding: 5 }}
-									>
-										Enroll NOW
-									</Button>
-								</View>
-							)}
+							<BuyCart {...{ navigation, data, enrolled, cart, pageScreen }} />
 						</View>
 					)}
 				</View>

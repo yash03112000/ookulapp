@@ -28,6 +28,16 @@ export const MyCoursesScreen = ({ item: data, navigation }) => {
 		initial();
 	}, [isFocused]);
 
+	function removeDuplicatesBy(keyFn, array) {
+		var mySet = new Set();
+		return array.filter(function (x) {
+			var key = keyFn(x),
+				isNew = !mySet.has(key);
+			if (isNew) mySet.add(key);
+			return isNew;
+		});
+	}
+
 	const initial = async () => {
 		setLoad(true);
 		const jwtUserToken = await SecureStore.getItemAsync('token');
@@ -38,7 +48,11 @@ export const MyCoursesScreen = ({ item: data, navigation }) => {
 		// console.log('listOfCourses', listOfCourses);
 
 		if (listOfCourses) {
-			setCourses(listOfCourses);
+			console.log(listOfCourses.length);
+			// var a = [...new Set(listOfCourses)];
+			var a = removeDuplicatesBy((x) => x.ID, listOfCourses);
+			console.log(a.length);
+			setCourses(a);
 			// setStatus(true);
 			setLoad(false);
 		} else {

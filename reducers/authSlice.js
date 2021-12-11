@@ -1,12 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-	loginLoading: false,
+	loginLoading: true,
 	loginSuccess: false,
 	loginFail: false,
 	logoutSuccess: false,
 	emailId: '',
 	netStatus: true,
+	cartCount: 0,
 };
 
 const authSlice = createSlice({
@@ -19,6 +20,8 @@ const authSlice = createSlice({
 		loginSuccessUpdate: (state) => {
 			state.loginLoading = false;
 			state.loginSuccess = true;
+			state.netStatus = true;
+
 			// state.userToken = action.payload;
 			//   state.loginFail = false;
 			//   state.logoutSuccess = false;
@@ -27,6 +30,7 @@ const authSlice = createSlice({
 			state.loginSuccess = false;
 			state.loginLoading = false;
 			state.loginFail = true;
+			state.netStatus = true;
 		},
 		loginOutUpdate: (state) => {
 			state.loginSuccess = false;
@@ -39,7 +43,11 @@ const authSlice = createSlice({
 		netUpdate: (state, actions) => {
 			// console.log(actions.payload);
 			state.netStatus = actions.payload;
+			state.loginLoading = false;
 			// state.netStatus = false;
+		},
+		cartUpdate: (state, actions) => {
+			state.cartCount = actions.payload;
 		},
 	},
 });
@@ -50,6 +58,7 @@ export const {
 	loginOutUpdate,
 	emailIdUpdate,
 	netUpdate,
+	cartUpdate,
 } = authSlice.actions;
 
 export default authSlice.reducer;

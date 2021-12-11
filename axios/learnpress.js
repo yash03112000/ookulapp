@@ -1,4 +1,5 @@
 import axiosInstance from './orgin';
+import axios from 'axios';
 
 export const getCourseList = () => {
 	return new Promise((resolve, reject) => {
@@ -87,7 +88,8 @@ export const getLessonList = (sectionId) => {
 
 export const getCourse = (courseId) => {
 	return new Promise((resolve, reject) => {
-		axiosInstance.get(`course/:${courseId}`).then((courseData) => {
+		console.log(courseId);
+		axiosInstance.get(`/course/${courseId}`).then((courseData) => {
 			const course = courseData.data;
 			if (course) {
 				// console.log("lessons from backend", course);
