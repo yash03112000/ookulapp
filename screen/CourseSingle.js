@@ -11,6 +11,7 @@ import { getLessonList, getSectionList } from '../axios/learnpress';
 import axiosInstance from '../axios/orgin';
 import LessonVideoPlayer from '../components/lessonVideoPlayer';
 import { useSelector, useDispatch } from 'react-redux';
+import PDFDisplay from '../components/PDFDisplay';
 
 /**
  * @author
@@ -56,20 +57,21 @@ export const CourseSingle = (props) => {
 		console.log('Message from initialRunFunction');
 		const sectionsArray = await getSectionList(courseId);
 		setsections(sectionsArray);
-		sectionsArray.forEach(async (section, sIndex) => {
-			//   console.log("section", section);
+
+		for (const [sIndex, section] of sectionsArray.entries()) {
 			const lessonsArray = await getLessonList(section.section_id);
-			// console.log('lessonsArray', lessonsArray[0]);
+			// // console.log('lessonsArray', lessonsArray[0]);
 			setlessonsOfSection((oldV) => ({
 				...oldV,
 				[section.section_id]: lessonsArray,
 			}));
 
-			if (props.route.params.from == 'Downloads') {
-				lessonClickedHandler(props.route.params);
-				setloading(false);
-			} else if (sIndex === 0) {
-				// console.log('runned');
+			console.log(sIndex);
+			console.log(sectionsArray.length);
+			console.log(!(props.route.params.from === 'Downloads'));
+
+			if (sIndex === 0 && !(props.route.params.from == 'Downloads')) {
+				console.log('runned');
 				setlsndet(lessonsArray[0]);
 				setactiveUris([
 					lessonsArray[0].video_hd || '',
@@ -84,10 +86,14 @@ export const CourseSingle = (props) => {
 					...oldV,
 					[lessonsArray[0].ID]: true,
 				}));
+			} else if (sIndex == sectionsArray.length - 1) {
+				console.log('aa');
+				if (props.route.params.from == 'Downloads') {
+					lessonClickedHandler(props.route.params);
+				}
 				setloading(false);
 			}
-			//   console.log("lessonsArray", lessonsArray);
-		});
+		}
 	};
 
 	const cleanupFunction = () => {
@@ -149,7 +155,7 @@ export const CourseSingle = (props) => {
 	};
 
 	//   const { container } = styles;
-	console.log(activeUris);
+	// console.log(activeUris);
 	return (
 		<View style={styles.main}>
 			{loading ? (
@@ -174,11 +180,16 @@ export const CourseSingle = (props) => {
 								alignItems: 'center',
 							}}
 						>
-							<Text>
-								{activeUris[6] !== ''
-									? activeUris[6]
-									: 'Document will be added soon'}
-							</Text>
+							{activeUris[6] !== '' ? (
+								<PDFDisplay
+									src={activeUris[6]}
+									lsndet={lsndet}
+									courseTitle={courseItitle}
+									courseId={courseId}
+								/>
+							) : (
+								<Text>Document will be added soon</Text>
+							)}
 						</View>
 					)}
 

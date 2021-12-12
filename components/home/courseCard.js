@@ -79,25 +79,27 @@ export default function CourseCard({
 	// console.log(loading);
 
 	useEffect(async () => {
-		let flag = true;
-		if (pageScreen !== 'CourseDetails') {
-			// console.log('hehe');
-			// console.log(pageScreen);
+		try {
+			let flag = true;
+			if (pageScreen !== 'CourseDetails') {
+				if (flag) setLoading(false);
+			} else {
+				const isStudentEnrolled = await isCourseEnrolled(token, data.ID);
+				if (flag) setEnrolled(isStudentEnrolled);
+				if (flag) setLoading(false);
+			}
 
-			if (flag) setLoading(false);
-		} else {
-			// console.log(flag);
-			const isStudentEnrolled = await isCourseEnrolled(token, data.ID);
-			if (flag) setEnrolled(isStudentEnrolled);
-			if (flag) setLoading(false);
+			return () => {
+				flag = false;
+			};
+		} catch (e) {
+			console.log(e);
 		}
-
-		return () => (flag = false);
 	}, []);
-	// console.log(loading);
 
 	const enter = () => {
 		// console.log("start of single course screen", pageScreen);
+		data['from'] = pageScreen;
 
 		navigation.navigate(pageScreen, data);
 	};
@@ -107,59 +109,108 @@ export default function CourseCard({
 			{loading ? (
 				<ActivityIndicator size="large" color="#0000ff" />
 			) : (
-				<View style={classes.head}>
-					<TouchableHighlight
-						style={classes.imgdiv}
-						// onPress={() => router.replace(`/course/${data._id}`)}
-						onPress={enter}
-					>
-						{data.mediaLink.wooGsLink == '' ? (
-							<Image
-								source={{
-									uri: 'https://storage.googleapis.com/media.ookul.co/ookulco/2021/07/3557f685-course-featured-image-100x100.jpg',
-								}}
-								style={classes.img}
-							/>
-						) : (
-							<Image
-								source={{
-									uri: data.mediaLink.originalLink,
-								}}
-								style={classes.img}
-							/>
-						)}
-					</TouchableHighlight>
-					<View style={classes.condiv}>
-						<View>
-							<Text style={classes.title}>{data.post_title}</Text>
-						</View>
-						<View
-							style={{
-								borderBottomColor: 'gray',
-								borderBottomWidth: 1,
-							}}
-						>
-							<Text style={classes.subtitle}>{data.short_description}</Text>
-						</View>
-						<View>
-							<Text style={{ color: 'gray', padding: 3 }}>
-								{'Number of Lesson/Notes: ' + data.wpCourseMeta.count_items}
-							</Text>
-						</View>
-						<View
-							style={{
-								borderBottomColor: 'gray',
-								borderBottomWidth: 1,
-							}}
-						>
-							<Text style={{ color: 'gray', padding: 3 }}>
-								{'Students Enrolled: ' + data.wpCourseMeta._lp_students}
-							</Text>
-						</View>
-					</View>
+				<View>
 					{pageScreen === 'CourseDetails' && (
-						<View>
+						<View style={classes.head}>
+							<TouchableHighlight
+								style={classes.imgdiv}
+								// onPress={() => router.replace(`/course/${data._id}`)}
+								onPress={enter}
+							>
+								{data.mediaLink.wooGsLink == '' ? (
+									<Image
+										source={{
+											uri: 'https://storage.googleapis.com/media.ookul.co/ookulco/2021/07/3557f685-course-featured-image-100x100.jpg',
+										}}
+										style={classes.img}
+									/>
+								) : (
+									<Image
+										source={{
+											uri: data.mediaLink.originalLink,
+										}}
+										style={classes.img}
+									/>
+								)}
+							</TouchableHighlight>
+							<View style={classes.condiv}>
+								<View>
+									<Text style={classes.title}>{data.post_title}</Text>
+								</View>
+								<View
+									style={{
+										borderBottomColor: 'gray',
+										borderBottomWidth: 1,
+									}}
+								>
+									<Text style={classes.subtitle}>{data.short_description}</Text>
+								</View>
+								<View>
+									<Text style={{ color: 'gray', padding: 3 }}>
+										{'Number of Lesson/Notes: ' + data.wpCourseMeta.count_items}
+									</Text>
+								</View>
+								<View
+									style={{
+										borderBottomColor: 'gray',
+										borderBottomWidth: 1,
+									}}
+								>
+									<Text style={{ color: 'gray', padding: 3 }}>
+										{'Students Enrolled: ' + data.wpCourseMeta._lp_students}
+									</Text>
+								</View>
+							</View>
 							<BuyCart {...{ navigation, data, enrolled, cart, pageScreen }} />
+						</View>
+					)}
+					{pageScreen === 'CourseSingle' && (
+						<View
+							style={{
+								display: 'flex',
+								flexDirection: 'row',
+								height: 120,
+								width,
+								padding: 2,
+								margin: 2,
+								// backgroundColor: 'white',
+								elevation: 3,
+							}}
+						>
+							<TouchableHighlight
+								style={{ height: '100%', width: 0.35 * width }}
+								// onPress={() => router.replace(`/course/${data._id}`)}
+								onPress={enter}
+							>
+								{data.mediaLink.wooGsLink == '' ? (
+									<Image
+										source={{
+											uri: 'https://storage.googleapis.com/media.ookul.co/ookulco/2021/07/3557f685-course-featured-image-100x100.jpg',
+										}}
+										style={classes.img}
+									/>
+								) : (
+									<Image
+										source={{
+											uri: data.mediaLink.originalLink,
+										}}
+										style={classes.img}
+									/>
+								)}
+							</TouchableHighlight>
+							<View style={classes.condiv}>
+								<View>
+									<Text style={classes.title}>{data.post_title}</Text>
+								</View>
+								<View
+									style={{
+										borderBottomColor: 'gray',
+										borderBottomWidth: 1,
+									}}
+								>
+									<Text style={classes.subtitle}>{data.short_description}</Text>
+								</View>
+							</View>
 						</View>
 					)}
 				</View>

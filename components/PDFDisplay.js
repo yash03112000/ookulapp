@@ -9,11 +9,12 @@ import {
 import { Video, AVPlaybackStatus } from 'expo-av';
 import { Portal, Dialog, Button } from 'react-native-paper';
 import { Ionicons } from 'react-native-vector-icons';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import * as SecureStore from 'expo-secure-store';
 import { useSelector, useDispatch } from 'react-redux';
+import Pdf from 'react-native-pdf';
 
 export default function PDFDisplay(props) {
 	const [URI, setURI] = useState('');
@@ -27,11 +28,14 @@ export default function PDFDisplay(props) {
 	const [downloadstatus, setDownloadstatus] = useState({
 		status1: false,
 	});
+	// const [open,setOpen] = useState(false)
 	const netStatus = useSelector((state) => state.auth.netStatus);
 
 	const checkFocused = useIsFocused();
 	const uri = props.src;
 	const lsnid = props.lsndet.ID;
+
+	const navigation = useNavigation();
 
 	useEffect(() => {
 		checkdownload();
@@ -118,7 +122,17 @@ export default function PDFDisplay(props) {
 		}
 	}
 
-	// console.log(activeVideoUri);
+	// console.log(downloadstatus);
+	// console.log(URI);
+
+	const openPDF = () => {
+		console.log('sss');
+		navigation.navigate('Home', {
+			screen: 'PDFScreen',
+			params: URI,
+		});
+	};
+
 	return loading ? (
 		<View>
 			<ActivityIndicator size="large" color="#0000ff" />
@@ -127,7 +141,9 @@ export default function PDFDisplay(props) {
 		<View style={styles.container}>
 			{downloadstatus.status1 ? (
 				<View>
-					<Button onPress={openPDF}>Open PDF</Button>
+					<Button onPress={openPDF} mode="contained">
+						Open PDF
+					</Button>
 				</View>
 			) : (
 				<View>
@@ -211,5 +227,9 @@ const styles = StyleSheet.create({
 		right: 0,
 		bottom: 0,
 		left: 0,
+	},
+	pdf: {
+		height: YY,
+		width: XX,
 	},
 });

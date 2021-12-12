@@ -62,9 +62,9 @@ export const MyCoursesScreen = ({ item: data, navigation }) => {
 	};
 
 	return (
-		<ScrollView style={classes.main}>
+		<View style={classes.main}>
 			{/* <LessonVideoPlayer/> */}
-			<Banner />
+			{/* <Banner /> */}
 			<View style={classes.heading}>
 				<Text style={classes.headtext}>Courses</Text>
 				{load ? (
@@ -75,7 +75,7 @@ export const MyCoursesScreen = ({ item: data, navigation }) => {
 					<View>
 						<FlatList
 							style={{ paddingBottom: 25, paddingTop: 5 }}
-							horizontal
+							// horizontal
 							// showsVerticalScrollIndicator
 							data={courses}
 							keyExtractor={(item) => item.ID.toString()}
@@ -86,7 +86,7 @@ export const MyCoursesScreen = ({ item: data, navigation }) => {
 					</View>
 				)}
 			</View>
-		</ScrollView>
+		</View>
 	);
 };
 

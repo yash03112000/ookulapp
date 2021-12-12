@@ -52,7 +52,10 @@ export const DownloadsScreen = () => {
 								key={lsn.ID + Math.random()}
 								onPress={() => {
 									lsn['from'] = 'Downloads';
-									navigation.navigate('CourseSingle', lsn);
+									navigation.navigate('My Courses', {
+										screen: 'CourseSingle',
+										params: lsn,
+									});
 								}}
 							>
 								<View>

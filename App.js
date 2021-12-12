@@ -17,7 +17,7 @@ import { CheckoutScreen } from './screen/CheckoutScreen';
 import { CourseScreen } from './screen/CourseScreen';
 import { CourseSingle } from './screen/CourseSingle';
 import { CourseDetails } from './screen/CourseDetails';
-
+import { PDFScreen } from './screen/PDFScreen.js';
 import { Provider } from 'react-redux';
 import { Provider as PaperProvider, Badge } from 'react-native-paper';
 const Tab = createBottomTabNavigator();
@@ -51,11 +51,6 @@ function HomeScreenComponents() {
 				// component={SingleCourseScreen}
 				options={{ headerShown: false }}
 			/>
-			{/* <Stack.Screen
-				name="CourseSingle"
-				component={CourseSingle}
-				options={{ headerShown: false }}
-			/> */}
 			<Stack.Screen
 				name="CourseDetails"
 				component={CourseDetails}
@@ -64,6 +59,11 @@ function HomeScreenComponents() {
 			<Stack.Screen
 				name="Cart"
 				component={Cart}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="PDFScreen"
+				component={PDFScreen}
 				options={{ headerShown: false }}
 			/>
 		</Stack.Navigator>
@@ -129,6 +129,8 @@ export const MyApp = () => {
 				SignUpScreen,
 				CourseScreen,
 				CheckoutScreen,
+				PDFScreen,
+				CourseSingle,
 			},
 		},
 	};
@@ -270,6 +272,11 @@ export const MyApp = () => {
 							<Stack.Screen
 								name="CourseSingle"
 								component={CourseSingle}
+								options={{ headerShown: false }}
+							/>
+							<Stack.Screen
+								name="PDFScreen"
+								component={PDFScreen}
 								options={{ headerShown: false }}
 							/>
 						</Stack.Navigator>

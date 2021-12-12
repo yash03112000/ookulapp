@@ -68,7 +68,7 @@ export const CourseDetails = (props) => {
 
 			const sectionsArray = await getSectionList(courseId);
 			setsections(sectionsArray);
-			sectionsArray.forEach(async (section, sIndex) => {
+			for (const [sIndex, section] of sectionsArray.entries()) {
 				//   console.log("section", section)activeUr;
 				const lessonsArray = await getLessonList(section.section_id);
 				//   console.log("lessonsArray", lessonsArray);
@@ -94,16 +94,12 @@ export const CourseDetails = (props) => {
 						[lessonsArray[0].ID]: true,
 					}));
 				}
-				// console.log(sIndex);
-				// console.log(sectionsArray.length);
 				if (sIndex === sectionsArray.length - 1) {
 					console.log('umm');
 					console.log(lessonsArray[0]);
 					setloading(false);
 				}
-
-				//   console.log("lessonsArray", lessonsArray);
-			});
+			}
 		} catch (e) {
 			console.log('ummm');
 			console.log(e);
