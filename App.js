@@ -18,8 +18,10 @@ import { CourseScreen } from './screen/CourseScreen';
 import { CourseSingle } from './screen/CourseSingle';
 import { CourseDetails } from './screen/CourseDetails';
 import { PDFScreen } from './screen/PDFScreen.js';
+import { EditProfileScreen } from './screen/EditProfileScreen';
 import { Provider } from 'react-redux';
 import { Provider as PaperProvider, Badge } from 'react-native-paper';
+import { OfflinePlayer } from './screen/OfflinePlayer';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -102,6 +104,30 @@ function ProfileScreenComponents() {
 			<Stack.Screen
 				name="CheckoutScreen"
 				component={CheckoutScreen}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="EditProfileScreen"
+				component={EditProfileScreen}
+				options={{ headerShown: false }}
+			/>
+		</Stack.Navigator>
+	);
+}
+
+function DownloadScreenComponents() {
+	return (
+		<Stack.Navigator>
+			<Stack.Screen
+				name="DownloadScreen"
+				component={DownloadsScreen}
+				// component={CourseSingle}
+				// component={SingleCourseScreen}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="OfflinePlayer"
+				component={OfflinePlayer}
 				options={{ headerShown: false }}
 			/>
 		</Stack.Navigator>
@@ -245,7 +271,10 @@ export const MyApp = () => {
 											component={MyCoursesScreenComponents}
 										/>
 										{/* <Tab.Screen name="My Test" component={MyTestScreen} /> */}
-										<Tab.Screen name="Downloads" component={DownloadsScreen} />
+										<Tab.Screen
+											name="Downloads"
+											component={DownloadScreenComponents}
+										/>
 										<Tab.Screen
 											name="Profile"
 											component={ProfileScreenComponents}
@@ -270,8 +299,8 @@ export const MyApp = () => {
 								options={{ headerShown: true }}
 							/>
 							<Stack.Screen
-								name="CourseSingle"
-								component={CourseSingle}
+								name="OfflinePlayer"
+								component={OfflinePlayer}
 								options={{ headerShown: false }}
 							/>
 							<Stack.Screen

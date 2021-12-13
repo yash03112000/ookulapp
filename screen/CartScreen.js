@@ -61,7 +61,7 @@ export const Cart = (props) => {
 					<Button
 						onPress={billingHandler}
 						mode="contained"
-						style={{ padding: 5 }}
+						style={{ padding: 5, marginVertical: 10 }}
 					>
 						Buy Now
 					</Button>

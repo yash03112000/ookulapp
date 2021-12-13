@@ -42,6 +42,7 @@ export default function LessonVideoPlayer(props) {
 		status1: false,
 		status2: false,
 	});
+	console.log(activeVideoUri);
 	const netStatus = useSelector((state) => state.auth.netStatus);
 
 	// console.log(props.lsndet);

@@ -35,6 +35,7 @@ const classes = StyleSheet.create({
 	img: {
 		height: '100%',
 		width: '100%',
+		resizeMode: 'center',
 	},
 	title: {
 		fontSize: 15,
@@ -98,10 +99,10 @@ export default function CourseCard({
 	}, []);
 
 	const enter = () => {
-		// console.log("start of single course screen", pageScreen);
+		console.log('start of single course screen', pageScreen);
 		data['from'] = pageScreen;
 
-		navigation.navigate(pageScreen, data);
+		navigation.navigate('CourseDetails', data);
 	};
 
 	return (
@@ -164,53 +165,64 @@ export default function CourseCard({
 							<BuyCart {...{ navigation, data, enrolled, cart, pageScreen }} />
 						</View>
 					)}
-					{pageScreen === 'CourseSingle' && (
+					{(pageScreen === 'CourseSingle' || pageScreen == 'Cart') && (
 						<View
 							style={{
-								display: 'flex',
-								flexDirection: 'row',
 								height: 120,
 								width,
 								padding: 2,
 								margin: 2,
 								// backgroundColor: 'white',
-								elevation: 3,
+								// elevation: 3,
 							}}
 						>
 							<TouchableHighlight
-								style={{ height: '100%', width: 0.35 * width }}
 								// onPress={() => router.replace(`/course/${data._id}`)}
 								onPress={enter}
 							>
-								{data.mediaLink.wooGsLink == '' ? (
-									<Image
-										source={{
-											uri: 'https://storage.googleapis.com/media.ookul.co/ookulco/2021/07/3557f685-course-featured-image-100x100.jpg',
-										}}
-										style={classes.img}
-									/>
-								) : (
-									<Image
-										source={{
-											uri: data.mediaLink.originalLink,
-										}}
-										style={classes.img}
-									/>
-								)}
-							</TouchableHighlight>
-							<View style={classes.condiv}>
-								<View>
-									<Text style={classes.title}>{data.post_title}</Text>
-								</View>
 								<View
 									style={{
-										borderBottomColor: 'gray',
-										borderBottomWidth: 1,
+										height: '100%',
+										width: width,
+										display: 'flex',
+										flexDirection: 'row',
 									}}
 								>
-									<Text style={classes.subtitle}>{data.short_description}</Text>
+									<View style={{ width: 0.35 * width }}>
+										{data.mediaLink.wooGsLink == '' ? (
+											<Image
+												source={{
+													uri: 'https://storage.googleapis.com/media.ookul.co/ookulco/2021/07/3557f685-course-featured-image-100x100.jpg',
+												}}
+												style={classes.img}
+											/>
+										) : (
+											<Image
+												source={{
+													uri: data.mediaLink.originalLink,
+												}}
+												style={classes.img}
+											/>
+										)}
+									</View>
+
+									<View style={classes.condiv}>
+										<View>
+											<Text style={classes.title}>{data.post_title}</Text>
+										</View>
+										<View
+											style={{
+												borderBottomColor: 'gray',
+												borderBottomWidth: 1,
+											}}
+										>
+											<Text style={classes.subtitle}>
+												{data.short_description}
+											</Text>
+										</View>
+									</View>
 								</View>
-							</View>
+							</TouchableHighlight>
 						</View>
 					)}
 				</View>

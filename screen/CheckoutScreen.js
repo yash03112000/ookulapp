@@ -34,6 +34,7 @@ export const CheckoutScreen = () => {
 
 	useEffect(async () => {
 		try {
+			console.log(isFocused);
 			if (isFocused) {
 				var cart = await SecureStore.getItemAsync('cart');
 				cart = JSON.parse(cart);
@@ -285,7 +286,7 @@ export const CheckoutScreen = () => {
 										</Text>
 									</View>
 									<View style={{ flex: 3 }}>
-										<Text style={{ fontSize: 15 }}>{item.post_name}</Text>
+										<Text style={{ fontSize: 15 }}>{item.post_title}</Text>
 									</View>
 								</View>
 								<View
@@ -354,7 +355,7 @@ export const CheckoutScreen = () => {
 							</View>
 							<View style={{ flex: 3, alignItems: 'flex-end' }}>
 								<Text style={{ fontSize: 17, padding: 10 }}>
-									{'\u20B9'} {price()}
+									{'\u20B9'} {salePrice()}
 								</Text>
 							</View>
 						</View>
@@ -380,7 +381,7 @@ export const CheckoutScreen = () => {
 									}}
 								>
 									{'\u20B9'}
-									{price() - salePrice() + couponDiscount}
+									{couponDiscount}
 								</Text>
 							</View>
 						</View>
