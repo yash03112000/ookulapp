@@ -171,6 +171,7 @@ export const CourseSingle = (props) => {
 							courseTitle={courseItitle}
 							courseId={courseId}
 							downloadQuality={downloadQuality}
+							pageScreen="CourseSingle"
 						/>
 					) : (
 						<View

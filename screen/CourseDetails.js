@@ -191,6 +191,7 @@ export const CourseDetails = (props) => {
 								lsndet={lsndet}
 								courseTitle={courseItitle}
 								courseId={courseId}
+								pageScreen="CourseDetails"
 							/>
 						) : (
 							<View

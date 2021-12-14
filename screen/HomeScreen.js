@@ -52,7 +52,6 @@ export const HomeScreen = ({ item: data, navigation }) => {
 
 	return (
 		<ScrollView style={classes.main}>
-			{/* <LessonVideoPlayer/> */}
 			<Banner />
 			<View style={classes.heading}>
 				<Text style={classes.headtext}>Out Top Courses</Text>

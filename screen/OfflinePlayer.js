@@ -50,41 +50,43 @@ export const OfflinePlayer = (props) => {
 
 	const initialRunFunction = async (courseId) => {
 		console.log('Message from initialRunFunction');
-		const sectionsArray = await getSectionList(courseId);
-		setsections(sectionsArray);
+		// const sectionsArray = await getSectionList(courseId);
+		// setsections(sectionsArray);
+		lessonClickedHandler(props.route.params);
+		setloading(false);
 
-		for (const [sIndex, section] of sectionsArray.entries()) {
-			const lessonsArray = await getLessonList(section.section_id);
-			// // console.log('lessonsArray', lessonsArray[0]);
-			setlessonsOfSection((oldV) => ({
-				...oldV,
-				[section.section_id]: lessonsArray,
-			}));
+		// for (const [sIndex, section] of sectionsArray.entries()) {
+		// 	const lessonsArray = await getLessonList(section.section_id);
+		// 	// // console.log('lessonsArray', lessonsArray[0]);
+		// 	setlessonsOfSection((oldV) => ({
+		// 		...oldV,
+		// 		[section.section_id]: lessonsArray,
+		// 	}));
 
-			if (sIndex === 0 && !(props.route.params.from == 'Downloads')) {
-				console.log('runned');
-				setlsndet(lessonsArray[0]);
-				setactiveUris([
-					lessonsArray[0].video_hd || '',
-					lessonsArray[0].video_sd_h || '',
-					lessonsArray[0].video_sd_l || '',
-					lessonsArray[0].video_download_sd_m || '',
-					lessonsArray[0].video_download_sd_l || '',
-					lessonsArray[0].type || '',
-					lessonsArray[0].doc || '',
-				]);
-				setlessonPlayingStatus((oldV) => ({
-					...oldV,
-					[lessonsArray[0].ID]: true,
-				}));
-			} else if (sIndex == sectionsArray.length - 1) {
-				console.log('aa');
-				if (props.route.params.from == 'Downloads') {
-					lessonClickedHandler(props.route.params);
-				}
-				setloading(false);
-			}
-		}
+		// 	if (sIndex === 0 && !(props.route.params.from == 'Downloads')) {
+		// 		console.log('runned');
+		// 		setlsndet(lessonsArray[0]);
+		// 		setactiveUris([
+		// 			lessonsArray[0].video_hd || '',
+		// 			lessonsArray[0].video_sd_h || '',
+		// 			lessonsArray[0].video_sd_l || '',
+		// 			lessonsArray[0].video_download_sd_m || '',
+		// 			lessonsArray[0].video_download_sd_l || '',
+		// 			lessonsArray[0].type || '',
+		// 			lessonsArray[0].doc || '',
+		// 		]);
+		// 		setlessonPlayingStatus((oldV) => ({
+		// 			...oldV,
+		// 			[lessonsArray[0].ID]: true,
+		// 		}));
+		// 	} else if (sIndex == sectionsArray.length - 1) {
+		// 		console.log('aa');
+		// 		if (props.route.params.from == 'Downloads') {
+		// 			lessonClickedHandler(props.route.params);
+		// 		}
+		// 		setloading(false);
+		// 	}
+		// }
 	};
 
 	const cleanupFunction = () => {
@@ -131,6 +133,7 @@ export const OfflinePlayer = (props) => {
 							courseTitle={courseItitle}
 							courseId={courseId}
 							downloadQuality={downloadQuality}
+							pageScreen="OfflinePlayer"
 						/>
 					) : (
 						<View

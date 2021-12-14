@@ -42,8 +42,8 @@ export default function LessonVideoPlayer(props) {
 		status1: false,
 		status2: false,
 	});
-	console.log(activeVideoUri);
 	const netStatus = useSelector((state) => state.auth.netStatus);
+	const pageScreen = props.pageScreen;
 
 	// console.log(props.lsndet);
 
@@ -53,6 +53,35 @@ export default function LessonVideoPlayer(props) {
 
 	const video = useRef(null);
 	// console.log(props);
+
+	const checkquality = async (videoTime, index) => {
+		try {
+			const a =
+				'file:///data/user/0/com.ookulapp/files/' +
+				lsnid +
+				'_' +
+				videoQualities[index] +
+				'.mp4';
+			console.log(a);
+			const file = await FileSystem.getInfoAsync(a, {});
+			console.log(file.exists);
+			if (file.exists) setactiveVideoUri(a);
+			else {
+				if (pageScreen !== 'OfflinePlayer') {
+					setactiveVideoUri(uris[index]);
+				} else {
+					alert(
+						'This action is not download mode. Please Try Downloaded qualities only'
+					);
+				}
+			}
+			video.current.setPositionAsync(videoTime);
+			video.current.playAsync();
+			setDownload({ quality: '', on: false });
+		} catch (e) {
+			console.log(e);
+		}
+	};
 	const changeQualityOffline = async (qIndex) => {
 		// const videoPlayerStatus = await video.current.getStatusAsync();
 		// const videoTime = videoPlayerStatus.positionMillis;
@@ -60,6 +89,7 @@ export default function LessonVideoPlayer(props) {
 
 		// console.log('video status positionMillis ', videoTime);
 		setQuality(qIndex);
+		// checkquality(0, qIndex);
 
 		// setactiveVideoUri(uris[qIndex]);
 		if (qIndex === 0) {
@@ -82,7 +112,7 @@ export default function LessonVideoPlayer(props) {
 	// console.log(checkFocused);
 
 	useEffect(() => {
-		checkquality();
+		checkquality(0, quality);
 	}, [uris]);
 	useEffect(() => {
 		checkdownload();
@@ -93,30 +123,6 @@ export default function LessonVideoPlayer(props) {
 		}
 	}, [checkFocused]);
 
-	const checkquality = async (videoTime) => {
-		const a =
-			'file:///data/user/0/com.ookulapp/files/' +
-			lsnid +
-			'_' +
-			videoQualities[quality] +
-			'.mp4';
-		// console.log(a);
-		const file = await FileSystem.getInfoAsync(a, {});
-		// console.log(file.exists);
-		if (file.exists) setactiveVideoUri(a);
-		else {
-			if (netStatus) {
-				setactiveVideoUri(uris[1]);
-			} else {
-				alert(
-					'This action is not offline mode. Please Try Downloaded qualities only'
-				);
-			}
-		}
-		video.current.setPositionAsync(videoTime);
-		video.current.playAsync();
-		setDownload({ quality: '', on: false });
-	};
 	const checkdownload = async () => {
 		const a =
 			'file:///data/user/0/com.ookulapp/files/' +
@@ -138,78 +144,6 @@ export default function LessonVideoPlayer(props) {
 		const status2 = file2.exists;
 		setDownloadstatus({ status1, status2 });
 	};
-
-	// const orientationCalculation = (gamma, beta) => {
-	// 	let ABSOLUTE_GAMMA = Math.abs(gamma);
-	// 	let ABSOLUTE_BETA = Math.abs(beta);
-	// 	let isGammaNegative = Math.sign(gamma) == '-1';
-	// 	let orientation = 0;
-
-	// 	if (ABSOLUTE_GAMMA <= 0.04 && ABSOLUTE_BETA <= 0.24) {
-	// 		//Portrait mode, on a flat surface.
-	// 		orientation = 0;
-	// 	} else if (
-	// 		(ABSOLUTE_GAMMA <= 1.0 || ABSOLUTE_GAMMA >= 2.3) &&
-	// 		ABSOLUTE_BETA >= 0.5
-	// 	) {
-	// 		//General Portrait mode, accounting for forward and back tilt on the top of the phone.
-	// 		orientation = 0;
-	// 	} else {
-	// 		if (isGammaNegative) {
-	// 			//Landscape mode with the top of the phone to the left.
-	// 			orientation = -90;
-	// 		} else {
-	// 			//Landscape mode with the top of the phone to the right.
-	// 			orientation = 90;
-	// 		}
-	// 	}
-	// 	return orientation;
-	// };
-	// console.log(ScreenOrientation.OrientationLock);
-
-	// React.useEffect(async () => {
-	// 	if (!checkFocused) {
-	// 		if (video.current) video.current.pauseAsync();
-	// 	}
-	// 	const a = await DeviceMotion.isAvailableAsync();
-	// 	// console.log(a)
-	// 	function startListingOriantation() {
-	// 		DeviceMotion.addListener(async (motion1) => {
-	// 			// setDeviceOriantation(motion1.orientation);
-	// 			// console.log(motion1.orientation);
-	// 			if (motion1.rotation) {
-	// 				const orientation = orientationCalculation(
-	// 					Number(motion1.rotation.gamma).toFixed(2),
-	// 					Number(motion1.rotation.beta).toFixed(2)
-	// 				);
-	// 				// console.log(orientation);
-	// 				// setDeviceOriantation(orientation);
-	// 				if (orientation === 90) {
-	// 					await ScreenOrientation.lockAsync(
-	// 						ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
-	// 					);
-	// 					if (video.current) await video.current.presentFullscreenPlayer();
-	// 				} else if (orientation === -90) {
-	// 					await ScreenOrientation.lockAsync(
-	// 						ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT
-	// 					);
-	// 					if (video.current) await video.current.presentFullscreenPlayer();
-	// 				} else {
-	// 					await ScreenOrientation.lockAsync(
-	// 						ScreenOrientation.OrientationLock.PORTRAIT
-	// 					);
-	// 					if (video.current) await video.current.dismissFullscreenPlayer();
-	// 				}
-	// 			}
-	// 		});
-	// 	}
-	// 	startListingOriantation();
-	// 	DeviceMotion.setUpdateInterval(2000);
-	// 	return function cleanup() {
-	// 		DeviceMotion.removeAllListeners();
-	// 		// console.log('reading stop at ', deviceOriantation, 'deg');
-	// 	};
-	// }, []);
 
 	function formatBytes(bytes, decimals = 2) {
 		if (bytes === 0) return '0 Bytes';
@@ -258,8 +192,10 @@ export default function LessonVideoPlayer(props) {
 		// setvideoCurrentPosition(videoPlayerStatus.positionMillis);
 
 		console.log('video status positionMillis ', videoTime);
-		setQuality(qIndex);
+		// setQuality(qIndex);
 		// setactiveVideoUri(uris[qIndex]);
+		checkquality(videoTime, qIndex);
+
 		if (qIndex === 0) {
 			setqualityButtonColor(['', 'gray', 'gray']);
 		} else if (qIndex === 1) {
@@ -267,7 +203,6 @@ export default function LessonVideoPlayer(props) {
 		} else {
 			setqualityButtonColor(['gray', 'gray', '']);
 		}
-		checkquality(videoTime);
 
 		// console.log("<<<<<<<<<<<<<<<", activeVideoUri);
 	};
@@ -441,7 +376,8 @@ export default function LessonVideoPlayer(props) {
 		}
 	};
 
-	// console.log(activeVideoUri);
+	// console.log(pageScreen);
+	console.log(activeVideoUri);
 	return (
 		<View style={styles.container}>
 			<Video
@@ -467,13 +403,22 @@ export default function LessonVideoPlayer(props) {
 				>
 					<Ionicons name="settings-outline" size={iconsize} color={iconcolor} />
 				</Button>
-				<Button
-					onPress={() => {
-						setVideoDownloadView(true);
-					}}
-				>
-					<Ionicons name="download-outline" size={iconsize} color={iconcolor} />
-				</Button>
+
+				{pageScreen !== 'OfflinePlayer' ? (
+					<Button
+						onPress={() => {
+							setVideoDownloadView(true);
+						}}
+					>
+						<Ionicons
+							name="download-outline"
+							size={iconsize}
+							color={iconcolor}
+						/>
+					</Button>
+				) : (
+					<></>
+				)}
 			</View>
 
 			<Portal style={styles.portalPos}>
@@ -507,22 +452,42 @@ export default function LessonVideoPlayer(props) {
 
 					<Dialog.Title style={{ marginBottom: 0 }}>Qualities</Dialog.Title>
 					<Dialog.Content>
-						<View style={styles.buttons}>
-							{videoQualities.map((Quality, qIndex) => (
-								<View style={styles.speedButtonsList} key={Quality}>
-									<Button
-										color={qualityButtonColor[qIndex]}
-										title={Quality.toString()}
-										mode="contained"
-										onPress={() => {
-											changeQuality(qIndex);
-										}}
-									>
-										{Quality}
-									</Button>
-								</View>
-							))}
-						</View>
+						{pageScreen !== 'OfflinePlayer' ? (
+							<View style={styles.buttons}>
+								{videoQualities.map((Quality, qIndex) => (
+									<View style={styles.speedButtonsList} key={Quality}>
+										<Button
+											color={qualityButtonColor[qIndex]}
+											title={Quality.toString()}
+											mode="contained"
+											onPress={() => {
+												changeQuality(qIndex);
+											}}
+										>
+											{Quality}
+										</Button>
+									</View>
+								))}
+							</View>
+						) : (
+							<View style={styles.buttons}>
+								{videoQualities2.map((Quality, qIndex) => (
+									<View style={styles.speedButtonsList} key={Quality}>
+										<Button
+											color={qualityButtonColor[qIndex + 1]}
+											disabled={!downloadstatus[`status${qIndex + 1}`]}
+											title={Quality.toString()}
+											mode="contained"
+											onPress={() => {
+												changeQuality(qIndex + 1);
+											}}
+										>
+											{Quality}
+										</Button>
+									</View>
+								))}
+							</View>
+						)}
 					</Dialog.Content>
 				</Dialog>
 			</Portal>

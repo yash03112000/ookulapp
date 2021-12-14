@@ -63,7 +63,6 @@ export const MyCoursesScreen = ({ item: data, navigation }) => {
 
 	return (
 		<View style={classes.main}>
-			{/* <LessonVideoPlayer/> */}
 			{/* <Banner /> */}
 			<View style={classes.heading}>
 				<Text style={classes.headtext}>Courses</Text>

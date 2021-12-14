@@ -104,6 +104,12 @@ export default function CourseCard({
 
 		navigation.navigate('CourseDetails', data);
 	};
+	const enter2 = () => {
+		console.log('start of single course screen', pageScreen);
+		data['from'] = pageScreen;
+
+		navigation.navigate('CourseSingle', data);
+	};
 
 	return (
 		<>
@@ -178,7 +184,7 @@ export default function CourseCard({
 						>
 							<TouchableHighlight
 								// onPress={() => router.replace(`/course/${data._id}`)}
-								onPress={enter}
+								onPress={enter2}
 							>
 								<View
 									style={{
