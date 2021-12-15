@@ -53,40 +53,6 @@ export const OfflinePlayer = (props) => {
 		// const sectionsArray = await getSectionList(courseId);
 		// setsections(sectionsArray);
 		lessonClickedHandler(props.route.params);
-		setloading(false);
-
-		// for (const [sIndex, section] of sectionsArray.entries()) {
-		// 	const lessonsArray = await getLessonList(section.section_id);
-		// 	// // console.log('lessonsArray', lessonsArray[0]);
-		// 	setlessonsOfSection((oldV) => ({
-		// 		...oldV,
-		// 		[section.section_id]: lessonsArray,
-		// 	}));
-
-		// 	if (sIndex === 0 && !(props.route.params.from == 'Downloads')) {
-		// 		console.log('runned');
-		// 		setlsndet(lessonsArray[0]);
-		// 		setactiveUris([
-		// 			lessonsArray[0].video_hd || '',
-		// 			lessonsArray[0].video_sd_h || '',
-		// 			lessonsArray[0].video_sd_l || '',
-		// 			lessonsArray[0].video_download_sd_m || '',
-		// 			lessonsArray[0].video_download_sd_l || '',
-		// 			lessonsArray[0].type || '',
-		// 			lessonsArray[0].doc || '',
-		// 		]);
-		// 		setlessonPlayingStatus((oldV) => ({
-		// 			...oldV,
-		// 			[lessonsArray[0].ID]: true,
-		// 		}));
-		// 	} else if (sIndex == sectionsArray.length - 1) {
-		// 		console.log('aa');
-		// 		if (props.route.params.from == 'Downloads') {
-		// 			lessonClickedHandler(props.route.params);
-		// 		}
-		// 		setloading(false);
-		// 	}
-		// }
 	};
 
 	const cleanupFunction = () => {
@@ -96,24 +62,9 @@ export const OfflinePlayer = (props) => {
 
 	const lessonClickedHandler = (lsn) => {
 		const lsnID = lsn.ID;
-		// console.log(lsn);
-		// console.log("clicked", lsn);
-		let lessonPD = lessonPlayingStatus;
-		Object.keys(lessonPD).forEach((v) => (lessonPD[v] = false));
-		setlessonPlayingStatus(lessonPD);
-		setlessonPlayingStatus((oldV) => ({ ...oldV, [lsnID]: true }));
-		// console.log("changed LessonPD", lessonPlayingStatus);
 		console.log('changing uris');
 		setlsndet(lsn);
-		setactiveUris([
-			lsn.video_hd,
-			lsn.video_sd_h,
-			lsn.video_sd_l,
-			lsn.video_download_sd_m,
-			lsn.video_download_sd_l,
-			lsn.type,
-			lsn.doc,
-		]);
+		setloading(false);
 	};
 
 	//   const { container } = styles;
@@ -124,7 +75,7 @@ export const OfflinePlayer = (props) => {
 				<ActivityIndicator size="large" color="#0000ff" />
 			) : (
 				<View>
-					{activeUris[5] === 'video' ? (
+					{lsndet['type'] === 'video' ? (
 						<LessonVideoPlayer
 							uris={{
 								uris: activeUris,
@@ -143,12 +94,13 @@ export const OfflinePlayer = (props) => {
 								alignItems: 'center',
 							}}
 						>
-							{activeUris[6] !== '' ? (
+							{lsndet['doc'] !== '' ? (
 								<PDFDisplay
-									src={activeUris[6]}
+									src={lsndet['doc']}
 									lsndet={lsndet}
 									courseTitle={courseItitle}
 									courseId={courseId}
+									pageScreen="OfflinePlayer"
 								/>
 							) : (
 								<Text>Document will be added soon</Text>

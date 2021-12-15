@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, Dimensions } from 'react-native';
+import { TouchableOpacity, Dimensions, FlatList } from 'react-native';
 import {
 	View,
 	Text,
@@ -20,6 +20,7 @@ import axiosInstance from '../axios/orgin';
 import { CourseAccess } from '../components/CourseAccess';
 import LessonVideoPlayer from '../components/lessonVideoPlayer';
 import PDFDisplay from '../components/PDFDisplay';
+import { LessonView } from '../components/LessonView';
 
 /**
  * @author
@@ -117,7 +118,7 @@ export const CourseDetails = (props) => {
 
 	const lessonClickedHandler = (lsn) => {
 		const lsnID = lsn.ID;
-		// console.log("clicked", lsn);
+		// console.log('clicked');
 		let lessonPD = lessonPlayingStatus;
 		if (boughtByUser) {
 			Object.keys(lessonPD).forEach((v) => (lessonPD[v] = false));
@@ -141,30 +142,39 @@ export const CourseDetails = (props) => {
 		setcourseAccessAlert(!boughtByUser);
 	};
 
-	const LessonsView = (props) => {
-		const sectionId = props.sectionId;
+	const LessonsViewIn = (sectionId) => {
+		// const sectionId = props.sectionId;
 		const listOfLesson = lessonsOfSection[sectionId];
 		try {
-			return listOfLesson.map((lsn) => (
-				<TouchableOpacity
-					style={
-						lessonPlayingStatus[lsn.ID] === true
-							? styles.buttonPlaying
-							: styles.button
-					}
-					key={lsn.ID + Math.random()}
-					onPress={() => lessonClickedHandler(lsn)}
-				>
-					<View>
-						<Text>
-							{lsn.post_title}
-							{' #'}
-							{lsn.ID}
-						</Text>
-					</View>
-				</TouchableOpacity>
-			));
+			// return listOfLesson.map((lsn) => (
+			// <LessonView
+			// 	status={lessonPlayingStatus[lsn.ID]}
+			// 	lsn={lsn}
+			// 	lessonClickedHandler={lessonClickedHandler}
+			// 	key={Math.random()}
+			// 	courseTitle={courseItitle}
+			// 	courseId={courseId}
+			// />
+			// ));
+
+			return (
+				<FlatList
+					data={listOfLesson}
+					keyExtractor={(item) => item.ID.toString()}
+					renderItem={({ item }) => (
+						<LessonView
+							status={lessonPlayingStatus[item.ID]}
+							lsn={item}
+							lessonClickedHandler={lessonClickedHandler}
+							key={Math.random()}
+							courseTitle={courseItitle}
+							courseId={courseId}
+						/>
+					)}
+				/>
+			);
 		} catch (error) {
+			console.log(error);
 			return (
 				<View key={Math.random() + Math.random()}>
 					<ActivityIndicator size="large" color="#0000ff" />
@@ -207,6 +217,7 @@ export const CourseDetails = (props) => {
 										lsndet={lsndet}
 										courseTitle={courseItitle}
 										courseId={courseId}
+										pageScreen="CourseDetails"
 									/>
 								) : (
 									<Text>Document will be added soon</Text>
@@ -240,9 +251,7 @@ export const CourseDetails = (props) => {
 												{sec.section_name} {' #'}
 												{sec.section_id.toString()}
 											</Text>
-											<View>
-												<LessonsView sectionId={sec.section_id} />
-											</View>
+											<View>{LessonsViewIn(sec.section_id)}</View>
 										</View>
 									))}
 								</View>

@@ -24,7 +24,7 @@
     "expo-secure-store": "^11.0.3",
     "expo-sensors": "^11.0.3",
     "expo-splash-screen": "~0.13.4",
-    "expo-status-bar": "~1.1.0",
+    "expo-status-bar": "^1.1.0",
     "expo-updates": "~0.10.5",
     "expo-web-browser": "^10.0.3",
     "fbjs": "^0.8.18",

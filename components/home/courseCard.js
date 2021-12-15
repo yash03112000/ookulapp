@@ -55,6 +55,7 @@ const classes = StyleSheet.create({
 		justifyContent: 'space-around',
 		// backgroundColor: 'blue',
 		height: 150,
+		marginHorizontal: 4,
 	},
 	pricediv: {
 		display: 'flex',

@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, Dimensions } from 'react-native';
 import {
 	View,
 	Text,
 	StyleSheet,
 	ScrollView,
 	ActivityIndicator,
+	TouchableOpacity,
+	Dimensions,
 } from 'react-native';
 import { getLessonList, getSectionList } from '../axios/learnpress';
 import axiosInstance from '../axios/orgin';
 import LessonVideoPlayer from '../components/lessonVideoPlayer';
 import { useSelector, useDispatch } from 'react-redux';
 import PDFDisplay from '../components/PDFDisplay';
+import { Button } from 'react-native-paper';
+import { Ionicons } from 'react-native-vector-icons';
+import { LessonView } from '../components/LessonView';
 
 /**
  * @author
@@ -122,30 +126,24 @@ export const CourseSingle = (props) => {
 			lsn.doc,
 		]);
 	};
-	const LessonsView = (props) => {
+	const width = Dimensions.get('window').width;
+
+	const LessonsViewIn = (props) => {
 		const sectionId = props.sectionId;
 		const listOfLesson = lessonsOfSection[sectionId];
 		try {
 			return listOfLesson.map((lsn) => (
-				<TouchableOpacity
-					style={
-						lessonPlayingStatus[lsn.ID] === true
-							? styles.buttonPlaying
-							: styles.button
-					}
-					key={lsn.ID + Math.random()}
-					onPress={() => lessonClickedHandler(lsn)}
-				>
-					<View>
-						<Text>
-							{lsn.post_title}
-							{' #'}
-							{lsn.ID}
-						</Text>
-					</View>
-				</TouchableOpacity>
+				<LessonView
+					status={lessonPlayingStatus[lsn.ID]}
+					lsn={lsn}
+					lessonClickedHandler={lessonClickedHandler}
+					key={Math.random()}
+					courseTitle={courseItitle}
+					courseId={courseId}
+				/>
 			));
 		} catch (error) {
+			console.log(error);
 			return (
 				<View key={Math.random() + Math.random()}>
 					<ActivityIndicator size="large" color="#0000ff" />
@@ -187,6 +185,7 @@ export const CourseSingle = (props) => {
 									lsndet={lsndet}
 									courseTitle={courseItitle}
 									courseId={courseId}
+									pageScreen="CourseSingle"
 								/>
 							) : (
 								<Text>Document will be added soon</Text>
@@ -219,7 +218,7 @@ export const CourseSingle = (props) => {
 														{sec.section_id.toString()}
 													</Text>
 													<View>
-														<LessonsView sectionId={sec.section_id} />
+														<LessonsViewIn sectionId={sec.section_id} />
 													</View>
 												</View>
 											))}
@@ -240,6 +239,7 @@ export const CourseSingle = (props) => {
 };
 
 const height = Dimensions.get('window').height;
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -279,6 +279,9 @@ const styles = StyleSheet.create({
 		textAlign: 'left',
 		marginTop: 1,
 		marginBottom: 1,
+		// flex: 5,
+		display: 'flex',
+		flexDirection: 'row',
 	},
 	buttonPlaying: {
 		// alignItems: "center",
@@ -287,5 +290,8 @@ const styles = StyleSheet.create({
 		textAlign: 'left',
 		marginTop: 1,
 		marginBottom: 1,
+		display: 'flex',
+		flexDirection: 'row',
+		// flex: 5,
 	},
 });

@@ -22,6 +22,8 @@ import { EditProfileScreen } from './screen/EditProfileScreen';
 import { Provider } from 'react-redux';
 import { Provider as PaperProvider, Badge } from 'react-native-paper';
 import { OfflinePlayer } from './screen/OfflinePlayer';
+import { StatusBar } from 'expo-status-bar';
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -87,6 +89,11 @@ function MyCoursesScreenComponents() {
 				component={CourseSingle}
 				options={{ headerShown: false }}
 			/>
+			<Stack.Screen
+				name="PDFScreen"
+				component={PDFScreen}
+				options={{ headerShown: false }}
+			/>
 		</Stack.Navigator>
 	);
 }
@@ -128,6 +135,11 @@ function DownloadScreenComponents() {
 			<Stack.Screen
 				name="OfflinePlayer"
 				component={OfflinePlayer}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="PDFScreen"
+				component={PDFScreen}
 				options={{ headerShown: false }}
 			/>
 		</Stack.Navigator>
@@ -321,6 +333,7 @@ export default function App({ navigation }) {
 		<Provider store={store}>
 			<PaperProvider>
 				<MyApp />
+				<StatusBar style="dark" backgroundColor="#5c02ab" />
 			</PaperProvider>
 		</Provider>
 	);

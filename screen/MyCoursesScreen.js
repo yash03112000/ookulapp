@@ -48,10 +48,10 @@ export const MyCoursesScreen = ({ item: data, navigation }) => {
 		// console.log('listOfCourses', listOfCourses);
 
 		if (listOfCourses) {
-			console.log(listOfCourses.length);
+			// console.log(listOfCourses.length);
 			// var a = [...new Set(listOfCourses)];
 			var a = removeDuplicatesBy((x) => x.ID, listOfCourses);
-			console.log(a.length);
+			// console.log(a.length);
 			setCourses(a);
 			// setStatus(true);
 			setLoad(false);
