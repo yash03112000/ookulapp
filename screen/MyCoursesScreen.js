@@ -15,18 +15,21 @@ import CourseCard from '../components/home/courseCard';
 import LessonVideoPlayer from '../components/lessonVideoPlayer';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 
 export const MyCoursesScreen = ({ item: data, navigation }) => {
 	const [courses, setCourses] = useState([]);
 	const [load, setLoad] = useState(true);
 	const pageScreen = 'CourseSingle';
-	const isFocused = useIsFocused();
+	const reload = useSelector((state) => state.auth.reload);
+
+	// const isFocused = useIsFocused();
 
 	// console.log("navigation", navigation);
 
 	useEffect(() => {
 		initial();
-	}, [isFocused]);
+	}, [reload]);
 
 	function removeDuplicatesBy(keyFn, array) {
 		var mySet = new Set();

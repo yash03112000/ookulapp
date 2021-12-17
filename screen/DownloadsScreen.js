@@ -73,7 +73,7 @@ export const DownloadsScreen = () => {
 			<ActivityIndicator size="large" color="#0000ff" />
 		</View>
 	) : (
-		<View style={{ width: width }}>
+		<View style={{}}>
 			{items.length == 0 ? (
 				<Text>No Downloads</Text>
 			) : (
@@ -87,6 +87,7 @@ export const DownloadsScreen = () => {
 										lsn['from'] = 'Downloads';
 										navigation.navigate('OfflinePlayer', lsn);
 									}}
+									style={{ flex: 8 }}
 								>
 									<View>
 										<Text>
@@ -96,7 +97,7 @@ export const DownloadsScreen = () => {
 										</Text>
 									</View>
 								</TouchableOpacity>
-								<View>
+								<View style={{ flex: 1 }}>
 									<Button onPress={() => deletefun(lsn)}>
 										<Ionicons
 											name="close-circle-outline"

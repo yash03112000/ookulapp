@@ -8,6 +8,7 @@ const initialState = {
 	emailId: '',
 	netStatus: true,
 	cartCount: 0,
+	reload: 0,
 };
 
 const authSlice = createSlice({
@@ -48,6 +49,10 @@ const authSlice = createSlice({
 		},
 		cartUpdate: (state, actions) => {
 			state.cartCount = actions.payload;
+			if (actions.payload === 0) state.reload++;
+		},
+		reloadApp: (state) => {
+			// state++;
 		},
 	},
 });
@@ -59,6 +64,7 @@ export const {
 	emailIdUpdate,
 	netUpdate,
 	cartUpdate,
+	reloadApp,
 } = authSlice.actions;
 
 export default authSlice.reducer;

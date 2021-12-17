@@ -106,17 +106,17 @@ function ProfileScreenComponents() {
 				component={ProfileScreen}
 				// component={CourseSingle}
 				// component={SingleCourseScreen}
-				options={{ headerShown: false }}
+				options={{ headerShown: true, title: 'Profile' }}
 			/>
 			<Stack.Screen
 				name="CheckoutScreen"
 				component={CheckoutScreen}
-				options={{ headerShown: false }}
+				options={{ headerShown: true, title: 'Order' }}
 			/>
 			<Stack.Screen
 				name="EditProfileScreen"
 				component={EditProfileScreen}
-				options={{ headerShown: false }}
+				options={{ headerShown: true, title: 'Edit' }}
 			/>
 		</Stack.Navigator>
 	);
@@ -290,6 +290,7 @@ export const MyApp = () => {
 										<Tab.Screen
 											name="Profile"
 											component={ProfileScreenComponents}
+											options={{ headerShown: false }}
 										/>
 									</Tab.Navigator>
 								</>
@@ -313,12 +314,12 @@ export const MyApp = () => {
 							<Stack.Screen
 								name="OfflinePlayer"
 								component={OfflinePlayer}
-								options={{ headerShown: false }}
+								options={{ headerShown: true }}
 							/>
 							<Stack.Screen
 								name="PDFScreen"
 								component={PDFScreen}
-								options={{ headerShown: false }}
+								options={{ headerShown: true }}
 							/>
 						</Stack.Navigator>
 					)}
@@ -333,7 +334,7 @@ export default function App({ navigation }) {
 		<Provider store={store}>
 			<PaperProvider>
 				<MyApp />
-				<StatusBar style="dark" backgroundColor="#5c02ab" />
+				<StatusBar style="dark" backgroundColor="#258068" />
 			</PaperProvider>
 		</Provider>
 	);

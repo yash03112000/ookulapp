@@ -9,6 +9,7 @@ import { RAZORPAY_KEY } from '../config/devProduction';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { cartUpdate } from '../reducers/authSlice';
 import { Dimensions } from 'react-native';
+import { reloadApp } from '../reducers/authSlice';
 
 const width = Dimensions.get('window').width;
 
@@ -30,39 +31,63 @@ export const CheckoutScreen = () => {
 	const [loading, setLoading] = useState(true);
 	const [cart, setCart] = useState([]);
 	const [couponDiscount, setCouponDiscount] = useState(0.0);
-	const [coupon, setCoupon] = useState('');
+	const [coupon, setCoupon] = useState({
+		code: '',
+		applied: false,
+	});
+	const [order, setOrder] = useState('');
 
 	useEffect(async () => {
 		try {
-			console.log(isFocused);
-			if (isFocused) {
-				var cart = await SecureStore.getItemAsync('cart');
-				cart = JSON.parse(cart);
-				setCart(cart);
-				const token = await SecureStore.getItemAsync('token');
-				const res = await axiosInstance.post('/user', { token });
-				const json = res.data.billing;
-				setForm({
-					first_name: json.first_name,
-					last_name: json.last_name,
-					address_1: json.address_1,
-					address_2: json.address_2,
-					city: json.city,
-					state: json.state,
-					postcode: json.postcode,
-					country: json.country,
-					email: json.email,
-					phone: json.phone,
-				});
-				setLoading(false);
-			}
+			// console.log(isFocused);
+			var cart = await SecureStore.getItemAsync('cart');
+			cart = JSON.parse(cart);
+			setCart(cart);
+			const token = await SecureStore.getItemAsync('token');
+			const res = await axiosInstance.post('/user', { token });
+			const json = res.data.billing;
+			setForm({
+				first_name: json.first_name,
+				last_name: json.last_name,
+				address_1: json.address_1,
+				address_2: json.address_2,
+				city: json.city,
+				state: json.state,
+				postcode: json.postcode,
+				country: json.country,
+				email: json.email,
+				phone: json.phone,
+			});
+			var item = [];
+			cart.forEach((a) => {
+				var b = {};
+				b['courseId'] = a.ID;
+				b['name'] = a.post_name;
+				b['salePrice'] = a.wpCourseMeta._lp_sale_price;
+				item.push(b);
+			});
+			// console.log(item);
+			const detailToRazor = {
+				payment_method: 'bacs',
+				payment_method_title: 'Mobile App Direct Bank Transfer',
+				customer_id: res.data.id,
+				billing: json,
+				courseItems: item,
+			};
+			// console.log(detailToRazor);
+			// console.log('what');
+			const order = await axiosInstance.post('/orders', {
+				detailToRazor,
+				token,
+			});
+			setOrder(order.data.id);
+
+			setLoading(false);
 		} catch (e) {
 			alert(e);
 			console.log(e);
 		}
-	}, [isFocused]);
-
-	const isFocused = useIsFocused();
+	}, []);
 
 	const removeFromCartHandler = async () => {
 		console.log('you clicked remove from Cart button');
@@ -74,6 +99,7 @@ export const CheckoutScreen = () => {
 			await SecureStore.setItemAsync('cart', JSON.stringify([]));
 			dispatch(cartUpdate(0));
 			navigation.navigate('My Courses');
+			// useDispatch(reloadApp());
 			setLoading(false);
 		} catch (e) {
 			console.log(e);
@@ -83,10 +109,11 @@ export const CheckoutScreen = () => {
 	};
 
 	const submit = async () => {
+		// console.log(order);
 		try {
 			console.log('Buy Now');
 			const token = await SecureStore.getItemAsync('token');
-			// console.log(form);
+			// console.log(order);
 			let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
 			if (reg.test(form.email)) {
 				const res = await axiosInstance.put('/user', {
@@ -116,52 +143,36 @@ export const CheckoutScreen = () => {
 						},
 					]);
 				} else {
-					var item = [];
-					cart.forEach((a) => {
-						var b = {};
-						b['courseId'] = a.ID;
-						b['name'] = a.post_name;
-						b['salePrice'] = a.wpCourseMeta._lp_sale_price;
-						item.push(b);
-					});
-					// console.log(item);
-					const detailToRazor = {
-						payment_method: 'bacs',
-						payment_method_title: 'Mobile App Direct Bank Transfer',
-						customer_id: res.data.id,
-						billing: json,
-						courseItems: item,
-					};
-					// console.log(detailToRazor);
-					// console.log('what');
-					const order_raw = await axiosInstance.post('/orders', {
-						detailToRazor,
-						token,
-					});
-					const order = order_raw.data;
 					// console.log(order);
-					// console.log(order.id);
-					const amount = (parseInt(order.total, 10) * 100).toString();
+					var bod = {
+						billing: json,
+					};
+					bod['token'] = token;
+					var order_raw = await axiosInstance.put(`/orders/${order}`, bod);
+					var order2 = order_raw.data;
+					console.log(parseFloat(order2.total) * 100);
+					amount = parseFloat(order2.total) * 100;
 					var options = {
 						description: 'OOkul Course',
 						image: 'https://i.imgur.com/3g7nmJC.png',
 						currency: 'INR',
 						key: RAZORPAY_KEY,
 						amount: amount,
-						name: order.billing.first_name + ' ' + order.billing.last_name,
+						name: order2.billing.first_name + ' ' + order2.billing.last_name,
 						// order_id: order.order_key, //Replace this with an order_id created using Orders API.
 						prefill: {
-							email: order.billing.email,
-							contact: order.billing.phone,
-							name: order.billing.first_name + ' ' + order.billing.last_name,
+							email: order2.billing.email,
+							contact: order2.billing.phone,
+							name: order2.billing.first_name + ' ' + order2.billing.last_name,
 						},
 						theme: { color: '#53a20e' },
 					};
+					console.log(options);
 					if (amount > 0) {
 						RazorpayCheckout.open(options)
 							.then(async (data) => {
 								// handle success
-								console.log(order.id);
+								// console.log(order.id);
 								var bod = {
 									status: 'completed',
 									payment_method: 'razorpay',
@@ -179,7 +190,7 @@ export const CheckoutScreen = () => {
 								// console.log(bod);
 								setLoading(true);
 
-								var res = await axiosInstance.put(`/orders/${order.id}`, bod);
+								var res = await axiosInstance.put(`/orders/${order}`, bod);
 								// alert(`Success: ${res.status}`);
 								if (res.status == 200) {
 									removeFromCartHandler();
@@ -188,7 +199,7 @@ export const CheckoutScreen = () => {
 							.catch((error) => {
 								// handle failure
 								console.log(error);
-								alert(`Error: ${error.code} | ${error.description}`);
+								alert(`Error: ${error.code} | ${error.error.description}`);
 							});
 					} else {
 						var bod = {
@@ -208,7 +219,7 @@ export const CheckoutScreen = () => {
 						// console.log(bod);
 						setLoading(true);
 
-						var update = await axiosInstance.put(`/orders/${order.id}`, bod);
+						var update = await axiosInstance.put(`/orders/${order}`, bod);
 						if (update.status == 200) {
 							removeFromCartHandler();
 						}
@@ -224,19 +235,35 @@ export const CheckoutScreen = () => {
 		}
 	};
 
-	const price = () => {
-		var sum = 0;
-		cart.forEach((item) => {
-			sum += parseFloat(item.wpCourseMeta._lp_price);
-		});
-		return sum;
-	};
 	const salePrice = () => {
 		var sum = 0;
 		cart.forEach((item) => {
 			sum += parseFloat(item.wpCourseMeta._lp_sale_price);
 		});
 		return sum;
+	};
+	// console.log(order);
+
+	const apply = async () => {
+		try {
+			const token = await SecureStore.getItemAsync('token');
+			console.log(order);
+			var bod = {
+				coupon_lines: [{ code: coupon.code }],
+			};
+			bod['token'] = token;
+			var res = await axiosInstance.put(`/orders/${order}`, bod);
+			console.log(res.data.coupon_lines[0].discount);
+			if (res.status === 200) {
+				setCouponDiscount(parseFloat(res.data.coupon_lines[0].discount));
+				setCoupon((prev) => ({ ...prev, ['applied']: true }));
+			} else {
+				alert('Coupon Code is Wrong');
+			}
+		} catch (e) {
+			alert('Coupon Code is Wrong');
+			console.log(e);
+		}
 	};
 
 	return loading ? (
@@ -425,9 +452,15 @@ export const CheckoutScreen = () => {
 					<View style={{ flex: 1, marginHorizontal: 5 }}>
 						<TextInput
 							label="Coupon Code"
-							value={coupon}
+							value={coupon.code}
 							mode="outlined"
-							onChangeText={(text) => setCoupon(text)}
+							onChangeText={(text) => {
+								setCoupon({
+									code: text,
+									applied: false,
+								});
+								setCouponDiscount(0);
+							}}
 							style={{ height: 40 }}
 						/>
 					</View>
@@ -435,9 +468,8 @@ export const CheckoutScreen = () => {
 						<Button
 							style={{ height: 40 }}
 							mode="contained"
-							onPress={() => {
-								alert('Soon');
-							}}
+							onPress={apply}
+							disabled={coupon.applied}
 						>
 							Apply Coupon
 						</Button>

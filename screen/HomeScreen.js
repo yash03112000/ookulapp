@@ -13,9 +13,8 @@ import axiosInstance from '../axios/orgin';
 import { Banner } from '../components/home/banner';
 import CourseCard from '../components/home/courseCard';
 import * as SecureStore from 'expo-secure-store';
+import { useSelector } from 'react-redux';
 // import { isCourseEnrolled } from '../axios/learnpress';
-import LessonVideoPlayer from '../components/lessonVideoPlayer';
-import { useIsFocused } from '@react-navigation/native';
 
 export const HomeScreen = ({ item: data, navigation }) => {
 	const [courses, setCourses] = useState([]);
@@ -23,12 +22,13 @@ export const HomeScreen = ({ item: data, navigation }) => {
 	const [cart, setCart] = useState([]);
 	const [token, setToken] = useState('');
 	const pageScreen = 'CourseDetails';
-	const isFocused = useIsFocused();
+	// const isFocused = useIsFocused();
 	// console.log("navigation", navigation);
+	const reload = useSelector((state) => state.auth.reload);
 
 	useEffect(() => {
-		if (isFocused) initial();
-	}, [isFocused]);
+		initial();
+	}, [reload]);
 
 	const initial = async () => {
 		setLoad(true);

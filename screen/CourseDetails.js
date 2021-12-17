@@ -132,6 +132,8 @@ export const CourseDetails = (props) => {
 				lsn.type || '',
 				lsn.doc || '',
 			]);
+		} else {
+			setcourseAccessAlert(true);
 		}
 	};
 
