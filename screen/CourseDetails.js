@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, Dimensions, FlatList } from 'react-native';
+import { TouchableOpacity, Dimensions } from 'react-native';
 import {
 	View,
 	Text,
@@ -20,7 +20,7 @@ import axiosInstance from '../axios/orgin';
 import { CourseAccess } from '../components/CourseAccess';
 import LessonVideoPlayer from '../components/lessonVideoPlayer';
 import PDFDisplay from '../components/PDFDisplay';
-import { LessonView } from '../components/LessonView';
+import { SectionView } from '../components/SectionView';
 
 /**
  * @author
@@ -36,7 +36,7 @@ export const CourseDetails = (props) => {
 	const [loading, setloading] = useState(true);
 	const [sections, setsections] = useState([]);
 	const [lessonsOfSection, setlessonsOfSection] = useState({});
-	const [lessonPlayingStatus, setlessonPlayingStatus] = useState({});
+	const [lessonPlayingStatus, setlessonPlayingStatus] = useState('');
 	const [activeUris, setactiveUris] = useState();
 	const [courseAccessAlert, setcourseAccessAlert] = useState(false);
 	const [boughtByUser, setboughtByUser] = useState(false);
@@ -90,10 +90,7 @@ export const CourseDetails = (props) => {
 						lessonsArray[0].type || '',
 						lessonsArray[0].doc || '',
 					]);
-					setlessonPlayingStatus((oldV) => ({
-						...oldV,
-						[lessonsArray[0].ID]: true,
-					}));
+					setlessonPlayingStatus(lessonsArray[0].ID);
 				}
 				if (sIndex === sectionsArray.length - 1) {
 					console.log('umm');
@@ -110,6 +107,7 @@ export const CourseDetails = (props) => {
 	};
 	// console.log(activeUris);
 	// console.log(loading);
+	console.log(lessonPlayingStatus);
 
 	const cleanupFunction = () => {
 		console.log('Message from clianup Function');
@@ -118,13 +116,9 @@ export const CourseDetails = (props) => {
 
 	const lessonClickedHandler = (lsn) => {
 		const lsnID = lsn.ID;
-		// console.log('clicked');
-		let lessonPD = lessonPlayingStatus;
+		console.log('clicked');
 		if (boughtByUser) {
-			Object.keys(lessonPD).forEach((v) => (lessonPD[v] = false));
-			setlessonPlayingStatus(lessonPD);
-			setlessonPlayingStatus((oldV) => ({ ...oldV, [lsnID]: true }));
-			// console.log("changed LessonPD", lessonPlayingStatus);
+			setlessonPlayingStatus(lsnID);
 			console.log('changing uris');
 			setlsndet(lsn);
 
@@ -139,52 +133,7 @@ export const CourseDetails = (props) => {
 				lsn.doc || '',
 			]);
 		}
-		setcourseAccessAlert(!boughtByUser);
 	};
-
-	const LessonsViewIn = (sectionId) => {
-		// const sectionId = props.sectionId;
-		const listOfLesson = lessonsOfSection[sectionId];
-		try {
-			// return listOfLesson.map((lsn) => (
-			// <LessonView
-			// 	status={lessonPlayingStatus[lsn.ID]}
-			// 	lsn={lsn}
-			// 	lessonClickedHandler={lessonClickedHandler}
-			// 	key={Math.random()}
-			// 	courseTitle={courseItitle}
-			// 	courseId={courseId}
-			// />
-			// ));
-
-			return (
-				<FlatList
-					data={listOfLesson}
-					keyExtractor={(item) => item.ID.toString()}
-					renderItem={({ item }) => (
-						<LessonView
-							status={lessonPlayingStatus[item.ID]}
-							lsn={item}
-							lessonClickedHandler={lessonClickedHandler}
-							key={Math.random()}
-							courseTitle={courseItitle}
-							courseId={courseId}
-						/>
-					)}
-				/>
-			);
-		} catch (error) {
-			console.log(error);
-			return (
-				<View key={Math.random() + Math.random()}>
-					<ActivityIndicator size="large" color="#0000ff" />
-				</View>
-			);
-		}
-	};
-
-	// console.log(activeUris);
-	// console.log(loading);
 
 	return (
 		<ScrollView ref={lessonRef} style={styles.totalLessonContainer}>
@@ -229,35 +178,41 @@ export const CourseDetails = (props) => {
 					</View>
 				)}
 				<View>
-					<View>
-						{loading ? (
-							<ActivityIndicator size="large" color="#0000ff" />
-						) : (
-							<View style={styles.sectionContainer}>
-								{!boughtByUser ? (
-									<View>
-										<CourseAccess
-											{...{ navigation: props.navigation, course }}
-										/>
-									</View>
-								) : (
-									<View></View>
-								)}
+					{loading ? (
+						<ActivityIndicator size="large" color="#0000ff" />
+					) : (
+						<View style={styles.sectionContainer}>
+							{!boughtByUser ? (
 								<View>
-									{sections.map((sec) => (
-										<View key={sec.section_id.toString()}>
-											<Text style={styles.sectionTitle}>
-												{' '}
-												{sec.section_name} {' #'}
-												{sec.section_id.toString()}
-											</Text>
-											<View>{LessonsViewIn(sec.section_id)}</View>
-										</View>
-									))}
+									<CourseAccess {...{ navigation: props.navigation, course }} />
 								</View>
+							) : (
+								<View></View>
+							)}
+							<View>
+								{sections.map((sec) => (
+									<View key={sec.section_id.toString()}>
+										<Text style={styles.sectionTitle}>
+											{' '}
+											{sec.section_name} {' #'}
+											{sec.section_id.toString()}
+										</Text>
+										<View>
+											<SectionView
+												sectionId={sec.section_id}
+												lessonClickedHandler={lessonClickedHandler}
+												key={sec.section_id}
+												courseTitle={courseItitle}
+												courseId={courseId}
+												lessonsOfSection={lessonsOfSection}
+												lessonPlayingStatus={lessonPlayingStatus}
+											/>
+										</View>
+									</View>
+								))}
 							</View>
-						)}
-					</View>
+						</View>
+					)}
 				</View>
 			</View>
 
@@ -323,6 +278,8 @@ const styles = StyleSheet.create({
 		textAlign: 'left',
 		marginTop: 1,
 		marginBottom: 1,
+		display: 'flex',
+		flexDirection: 'row',
 	},
 	buttonPlaying: {
 		// alignItems: "center",
@@ -331,5 +288,7 @@ const styles = StyleSheet.create({
 		textAlign: 'left',
 		marginTop: 1,
 		marginBottom: 1,
+		display: 'flex',
+		flexDirection: 'row',
 	},
 });

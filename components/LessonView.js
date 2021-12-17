@@ -46,7 +46,7 @@ export const LessonView = ({
 		checkquality();
 
 		return () => {
-			console.log('vlear');
+			// console.log('vlear');
 		};
 	}, [lsn]);
 
@@ -141,8 +141,14 @@ export const LessonView = ({
 	}
 	const checkquality = async () => {
 		try {
-			const a = 'file:///data/user/0/com.ookulapp/files/' + lsn.ID + '.mp4';
-			console.log(a);
+			let local = '';
+			if (lsn['type'] === 'video') {
+				local = '.mp4';
+			} else {
+				local = '.pdf';
+			}
+			const a = 'file:///data/user/0/com.ookulapp/files/' + lsn.ID + local;
+			// console.log(a);
 			const file = await FileSystem.getInfoAsync(a, {});
 			// console.log(file.exists);
 			if (file.exists) setDoStatus(true);
@@ -160,10 +166,10 @@ export const LessonView = ({
 			<ActivityIndicator size="large" color="#0000ff" />
 		</View>
 	) : (
-		<View style={status ? styles.buttonPlaying : styles.button}>
+		<View style={status === lsn.ID ? styles.buttonPlaying : styles.button}>
 			<TouchableOpacity
 				style={{ flex: 8 }}
-				key={lsn.ID + Math.random()}
+				key={lsn.ID}
 				onPress={() => lessonClickedHandler(lsn)}
 			>
 				<View>

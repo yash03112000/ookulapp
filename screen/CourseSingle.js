@@ -15,7 +15,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import PDFDisplay from '../components/PDFDisplay';
 import { Button } from 'react-native-paper';
 import { Ionicons } from 'react-native-vector-icons';
-import { LessonView } from '../components/LessonView';
+import { SectionView } from '../components/SectionView';
 
 /**
  * @author
@@ -44,7 +44,7 @@ export const CourseSingle = (props) => {
 	const [loading, setloading] = useState(true);
 	const [sections, setsections] = useState([]);
 	const [lessonsOfSection, setlessonsOfSection] = useState({});
-	const [lessonPlayingStatus, setlessonPlayingStatus] = useState({});
+	const [lessonPlayingStatus, setlessonPlayingStatus] = useState('');
 	const [activeUris, setactiveUris] = useState();
 	const [lsndet, setlsndet] = useState({});
 	const netStatus = useSelector((state) => state.auth.netStatus);
@@ -86,10 +86,7 @@ export const CourseSingle = (props) => {
 					lessonsArray[0].type || '',
 					lessonsArray[0].doc || '',
 				]);
-				setlessonPlayingStatus((oldV) => ({
-					...oldV,
-					[lessonsArray[0].ID]: true,
-				}));
+				setlessonPlayingStatus(lessonsArray[0].ID);
 			} else if (sIndex == sectionsArray.length - 1) {
 				console.log('aa');
 				if (props.route.params.from == 'Downloads') {
@@ -107,50 +104,22 @@ export const CourseSingle = (props) => {
 
 	const lessonClickedHandler = (lsn) => {
 		const lsnID = lsn.ID;
-		// console.log(lsn);
-		// console.log("clicked", lsn);
-		let lessonPD = lessonPlayingStatus;
-		Object.keys(lessonPD).forEach((v) => (lessonPD[v] = false));
-		setlessonPlayingStatus(lessonPD);
-		setlessonPlayingStatus((oldV) => ({ ...oldV, [lsnID]: true }));
-		// console.log("changed LessonPD", lessonPlayingStatus);
+		console.log('clicked');
+		setlessonPlayingStatus(lsnID);
 		console.log('changing uris');
 		setlsndet(lsn);
+
 		setactiveUris([
-			lsn.video_hd,
-			lsn.video_sd_h,
-			lsn.video_sd_l,
-			lsn.video_download_sd_m,
-			lsn.video_download_sd_l,
-			lsn.type,
-			lsn.doc,
+			lsn.video_hd || '',
+			lsn.video_sd_h || '',
+			lsn.video_sd_l || '',
+			lsn.video_download_sd_m || '',
+			lsn.video_download_sd_l || '',
+			lsn.type || '',
+			lsn.doc || '',
 		]);
 	};
 	const width = Dimensions.get('window').width;
-
-	const LessonsViewIn = (props) => {
-		const sectionId = props.sectionId;
-		const listOfLesson = lessonsOfSection[sectionId];
-		try {
-			return listOfLesson.map((lsn) => (
-				<LessonView
-					status={lessonPlayingStatus[lsn.ID]}
-					lsn={lsn}
-					lessonClickedHandler={lessonClickedHandler}
-					key={Math.random()}
-					courseTitle={courseItitle}
-					courseId={courseId}
-				/>
-			));
-		} catch (error) {
-			console.log(error);
-			return (
-				<View key={Math.random() + Math.random()}>
-					<ActivityIndicator size="large" color="#0000ff" />
-				</View>
-			);
-		}
-	};
 
 	//   const { container } = styles;
 	// console.log(activeUris);
@@ -218,7 +187,15 @@ export const CourseSingle = (props) => {
 														{sec.section_id.toString()}
 													</Text>
 													<View>
-														<LessonsViewIn sectionId={sec.section_id} />
+														<SectionView
+															sectionId={sec.section_id}
+															lessonClickedHandler={lessonClickedHandler}
+															key={sec.section_id}
+															courseTitle={courseItitle}
+															courseId={courseId}
+															lessonsOfSection={lessonsOfSection}
+															lessonPlayingStatus={lessonPlayingStatus}
+														/>
 													</View>
 												</View>
 											))}

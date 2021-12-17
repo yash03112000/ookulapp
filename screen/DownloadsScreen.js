@@ -6,8 +6,12 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	ActivityIndicator,
+	Dimensions,
 } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { Ionicons, MaterialCommunityIcons } from 'react-native-vector-icons';
+import { Button } from 'react-native-paper';
+import * as FileSystem from 'expo-file-system';
 import * as SecureStore from 'expo-secure-store';
 
 /**
@@ -34,12 +38,42 @@ export const DownloadsScreen = () => {
 	}, [isFocused]);
 	const { container } = styles;
 
+	const deletefun = async (lsn) => {
+		try {
+			let link = '';
+			if (lsn.type === 'video') {
+				link = 'file:///data/user/0/com.ookulapp/files/' + lsn.ID + '.mp4';
+			} else {
+				link = 'file:///data/user/0/com.ookulapp/files/' + lsn.ID + '.pdf';
+			}
+			await FileSystem.deleteAsync(link);
+			var downlist = await SecureStore.getItemAsync('downlist');
+			downlist = JSON.parse(downlist);
+			data = lsn;
+			var a = downlist.filter((e) => e.ID !== data.ID);
+			// console.log(data);
+			// if (downlist) {
+			// 	if (downlist.filter((e) => e.ID === data.ID).length > 0) {
+			// 		console.log('Already In downlist');
+			// 	} else {
+			// 		// console.log(data);
+			// 		downlist.push(data);
+			// 		await SecureStore.setItemAsync('downlist', JSON.stringify(downlist));
+			// 	}
+			// }
+			await SecureStore.setItemAsync('downlist', JSON.stringify(a));
+			setItems(a);
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
 	return loading ? (
 		<View style={container}>
 			<ActivityIndicator size="large" color="#0000ff" />
 		</View>
 	) : (
-		<View style={container}>
+		<View style={{ width: width }}>
 			{items.length == 0 ? (
 				<Text>No Downloads</Text>
 			) : (
@@ -47,22 +81,31 @@ export const DownloadsScreen = () => {
 					{items.map((lsn) => {
 						// console.log(item);
 						return (
-							<TouchableOpacity
-								style={styles.button}
-								key={lsn.ID + Math.random()}
-								onPress={() => {
-									lsn['from'] = 'Downloads';
-									navigation.navigate('OfflinePlayer', lsn);
-								}}
-							>
+							<View key={lsn.ID} style={styles.button}>
+								<TouchableOpacity
+									onPress={() => {
+										lsn['from'] = 'Downloads';
+										navigation.navigate('OfflinePlayer', lsn);
+									}}
+								>
+									<View>
+										<Text>
+											{lsn.post_title}
+											{' #'}
+											{lsn.ID}
+										</Text>
+									</View>
+								</TouchableOpacity>
 								<View>
-									<Text>
-										{lsn.post_title}
-										{' #'}
-										{lsn.ID}
-									</Text>
+									<Button onPress={() => deletefun(lsn)}>
+										<Ionicons
+											name="close-circle-outline"
+											size={25}
+											color={'black'}
+										/>
+									</Button>
 								</View>
-							</TouchableOpacity>
+							</View>
 						);
 					})}
 				</ScrollView>
@@ -71,9 +114,11 @@ export const DownloadsScreen = () => {
 	);
 };
 
+const width = Dimensions.get('window').width;
+
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		flexDirection: 'row',
 		// flexDirection: 'row',
 		// justifyContent: 'center',
 		// alignItems: 'center',
@@ -85,6 +130,8 @@ const styles = StyleSheet.create({
 		textAlign: 'left',
 		marginTop: 1,
 		marginBottom: 1,
+		flexDirection: 'row',
+		width: width,
 	},
 	buttonPlaying: {
 		// alignItems: "center",
