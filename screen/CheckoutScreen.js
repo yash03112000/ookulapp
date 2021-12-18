@@ -246,6 +246,7 @@ export const CheckoutScreen = () => {
 
 	const apply = async () => {
 		try {
+			setLoading(true);
 			const token = await SecureStore.getItemAsync('token');
 			console.log(order);
 			var bod = {
@@ -260,8 +261,10 @@ export const CheckoutScreen = () => {
 			} else {
 				alert('Coupon Code is Wrong');
 			}
+			setLoading(false);
 		} catch (e) {
 			alert('Coupon Code is Wrong');
+			setLoading(false);
 			console.log(e);
 		}
 	};
@@ -380,7 +383,7 @@ export const CheckoutScreen = () => {
 									Price:
 								</Text>
 							</View>
-							<View style={{ flex: 3, alignItems: 'flex-end' }}>
+							<View style={{ flex: 2, alignItems: 'flex-end' }}>
 								<Text style={{ fontSize: 17, padding: 10 }}>
 									{'\u20B9'} {salePrice()}
 								</Text>
@@ -399,7 +402,7 @@ export const CheckoutScreen = () => {
 									Discount:
 								</Text>
 							</View>
-							<View style={{ flex: 3, alignItems: 'flex-end' }}>
+							<View style={{ flex: 2, alignItems: 'flex-end' }}>
 								<Text
 									style={{
 										fontSize: 17,
@@ -428,7 +431,7 @@ export const CheckoutScreen = () => {
 									Total Price:
 								</Text>
 							</View>
-							<View style={{ flex: 3, alignItems: 'flex-end' }}>
+							<View style={{ flex: 2, alignItems: 'flex-end' }}>
 								<Text style={{ fontSize: 17, padding: 10, fontWeight: 'bold' }}>
 									{'\u20B9'}
 									{salePrice() - couponDiscount}

@@ -5,6 +5,7 @@ import {
 	StyleSheet,
 	ScrollView,
 	ActivityIndicator,
+	Dimensions,
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import CourseCard from '../components/home/courseCard';
@@ -44,32 +45,40 @@ export const Cart = (props) => {
 			<ActivityIndicator size="large" color="#0000ff" />
 		</View>
 	) : (
-		<View style={container}>
+		<View style={{}}>
 			{items.length == 0 ? (
 				<Text>Cart is Empty</Text>
 			) : (
-				<ScrollView style={{}}>
-					{items.map((item) => {
-						// console.log(item);
-						return (
-							<CourseCard
-								key={item.ID}
-								{...{ item, navigation, pageScreen: 'Cart' }}
-							/>
-						);
-					})}
-					<Button
-						onPress={billingHandler}
-						mode="contained"
-						style={{ padding: 5, marginVertical: 10 }}
-					>
-						Buy Now
-					</Button>
-				</ScrollView>
+				<View style={{ height }}>
+					<View style={{ height: 0.75 * height }}>
+						<ScrollView>
+							{items.map((item) => {
+								// console.log(item);
+								return (
+									<CourseCard
+										key={item.ID}
+										{...{ item, navigation, pageScreen: 'Cart' }}
+									/>
+								);
+							})}
+						</ScrollView>
+					</View>
+
+					<View style={{ height: 0.1 * height }}>
+						<Button
+							onPress={billingHandler}
+							mode="contained"
+							style={{ padding: 5, marginVertical: 10 }}
+						>
+							Buy Now
+						</Button>
+					</View>
+				</View>
 			)}
 		</View>
 	);
 };
+const height = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
 	container: {

@@ -12,6 +12,9 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 import { BuyCart } from '../BuyCart';
 import { Button } from 'react-native-paper';
 import { isCourseEnrolled } from '../../axios/learnpress';
+import * as SecureStore from 'expo-secure-store';
+import { useDispatch } from 'react-redux';
+import { cartUpdate, reloadApp } from '../../reducers/authSlice';
 
 const { manifest } = Constants;
 
@@ -56,6 +59,7 @@ const classes = StyleSheet.create({
 		// backgroundColor: 'blue',
 		height: 150,
 		marginHorizontal: 4,
+		// width: 0.62 * width,
 	},
 	pricediv: {
 		display: 'flex',
@@ -77,6 +81,7 @@ export default function CourseCard({
 	const [loading, setLoading] = useState(true);
 	// const [cart, setCart] = useState([]);
 	const [enrolled, setEnrolled] = useState(false);
+	const dispatch = useDispatch();
 
 	// console.log(loading);
 
@@ -109,8 +114,32 @@ export default function CourseCard({
 		console.log('start of single course screen', pageScreen);
 		data['from'] = pageScreen;
 
-		navigation.navigate('CourseSingle', data);
+		navigation.navigate('Home', {
+			screen: 'CourseDetails',
+			params: data,
+		});
 	};
+
+	const remove = async () => {
+		console.log('you clicked remove from Cart button');
+		// navigation.push('Home', {
+		// 	screen: 'Cart',
+		// });
+		try {
+			// var cart = await SecureStore.getItemAsync('cart');
+			var cart = await SecureStore.getItemAsync('cart');
+			cart = JSON.parse(cart);
+			var a = cart.filter((e) => e.ID !== data.ID);
+			await SecureStore.setItemAsync('cart', JSON.stringify(a));
+
+			dispatch(cartUpdate(a.length));
+			dispatch(reloadApp());
+			setLoading(false);
+		} catch (e) {
+			console.log(e);
+		}
+	};
+	// console.log(pageScreen);
 
 	return (
 		<>
@@ -175,61 +204,88 @@ export default function CourseCard({
 					{(pageScreen === 'CourseSingle' || pageScreen == 'Cart') && (
 						<View
 							style={{
-								height: 120,
+								height: 200,
 								width,
-								padding: 2,
-								margin: 2,
-								// backgroundColor: 'white',
+								// padding: 2,
+								marginVertical: 6,
+								backgroundColor: 'white',
 								// elevation: 3,
+								display: 'flex',
+								flexDirection: 'column',
 							}}
 						>
-							<TouchableHighlight
-								// onPress={() => router.replace(`/course/${data._id}`)}
-								onPress={enter2}
-							>
-								<View
-									style={{
-										height: '100%',
-										width: width,
-										display: 'flex',
-										flexDirection: 'row',
-									}}
-								>
-									<View style={{ width: 0.35 * width }}>
-										{data.mediaLink.wooGsLink == '' ? (
-											<Image
-												source={{
-													uri: 'https://storage.googleapis.com/media.ookul.co/ookulco/2021/07/3557f685-course-featured-image-100x100.jpg',
-												}}
-												style={classes.img}
-											/>
-										) : (
-											<Image
-												source={{
-													uri: data.mediaLink.originalLink,
-												}}
-												style={classes.img}
-											/>
-										)}
-									</View>
+							<View
+								style={{
+									// height: '70%',
+									width: width,
 
-									<View style={classes.condiv}>
-										<View>
-											<Text style={classes.title}>{data.post_title}</Text>
+									backgroundColor: '#faf8f2',
+									flex: 3,
+								}}
+							>
+								<TouchableHighlight
+									// onPress={() => router.replace(`/course/${data._id}`)}
+									onPress={enter2}
+								>
+									<View
+										style={{
+											display: 'flex',
+											flexDirection: 'row',
+											// backgroundColor: 'red',
+										}}
+									>
+										<View style={{ flex: 1 }}>
+											{data.mediaLink.wooGsLink == '' ? (
+												<Image
+													source={{
+														uri: 'https://storage.googleapis.com/media.ookul.co/ookulco/2021/07/3557f685-course-featured-image-100x100.jpg',
+													}}
+													style={classes.img}
+												/>
+											) : (
+												<Image
+													source={{
+														uri: data.mediaLink.originalLink,
+													}}
+													style={classes.img}
+												/>
+											)}
 										</View>
+
 										<View
 											style={{
-												borderBottomColor: 'gray',
-												borderBottomWidth: 1,
+												display: 'flex',
+												flexDirection: 'column',
+												justifyContent: 'center',
+												alignItems: 'center',
+												flex: 2,
 											}}
 										>
-											<Text style={classes.subtitle}>
-												{data.short_description}
-											</Text>
+											<View>
+												<Text style={classes.title}>{data.post_title}</Text>
+											</View>
+											<View
+												style={
+													{
+														// borderBottomColor: 'gray',
+														// borderBottomWidth: 1,
+													}
+												}
+											>
+												<Text style={classes.subtitle}>
+													{data.short_description}
+												</Text>
+											</View>
 										</View>
 									</View>
+								</TouchableHighlight>
+							</View>
+
+							{pageScreen === 'Cart' && (
+								<View style={{ flex: 1 }}>
+									<Button onPress={remove}>Remove From Cart</Button>
 								</View>
-							</TouchableHighlight>
+							)}
 						</View>
 					)}
 				</View>
