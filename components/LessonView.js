@@ -28,6 +28,7 @@ export const LessonView = ({
 	lessonClickedHandler,
 	courseTitle,
 	courseId,
+	allowed,
 }) => {
 	const width = Dimensions.get('window').width;
 
@@ -49,6 +50,8 @@ export const LessonView = ({
 			// console.log('vlear');
 		};
 	}, [lsn]);
+
+	// console.log(allowed);
 
 	function formatBytes(bytes, decimals = 2) {
 		if (bytes === 0) return '0 Bytes';
@@ -180,39 +183,41 @@ export const LessonView = ({
 					</Text>
 				</View>
 			</TouchableOpacity>
-			<View style={{ flex: 1 }}>
-				{doStatus ? (
-					<Button onPress={() => {}}>
-						<Ionicons name="checkmark-circle" size={25} color={'black'} />
-					</Button>
-				) : (
-					<View>
-						{download.on ? (
-							<Button
-								onPress={() => {
-									setVideoDownloadView(true);
-								}}
-							>
-								<MaterialCommunityIcons
-									name="progress-download"
-									size={25}
-									color={'black'}
-								/>
-							</Button>
-						) : (
-							<Button
-								onPress={() => {
-									lsn.type === 'video'
-										? setVideoDownloadView(true)
-										: downloadHandler(0);
-								}}
-							>
-								<Ionicons name="download-outline" size={25} color={'black'} />
-							</Button>
-						)}
-					</View>
-				)}
-			</View>
+			{allowed && (
+				<View style={{ flex: 1 }}>
+					{doStatus ? (
+						<Button onPress={() => {}}>
+							<Ionicons name="checkmark-circle" size={25} color={'black'} />
+						</Button>
+					) : (
+						<View>
+							{download.on ? (
+								<Button
+									onPress={() => {
+										setVideoDownloadView(true);
+									}}
+								>
+									<MaterialCommunityIcons
+										name="progress-download"
+										size={25}
+										color={'black'}
+									/>
+								</Button>
+							) : (
+								<Button
+									onPress={() => {
+										lsn.type === 'video'
+											? setVideoDownloadView(true)
+											: downloadHandler(0);
+									}}
+								>
+									<Ionicons name="download-outline" size={25} color={'black'} />
+								</Button>
+							)}
+						</View>
+					)}
+				</View>
+			)}
 
 			<Portal style={styles.portalPos}>
 				<Dialog

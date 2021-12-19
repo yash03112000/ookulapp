@@ -107,7 +107,7 @@ export const CourseDetails = (props) => {
 	};
 	// console.log(activeUris);
 	// console.log(loading);
-	console.log(lessonPlayingStatus);
+	// console.log(lessonPlayingStatus);
 
 	const cleanupFunction = () => {
 		console.log('Message from clianup Function');
@@ -208,6 +208,7 @@ export const CourseDetails = (props) => {
 												courseId={courseId}
 												lessonsOfSection={lessonsOfSection}
 												lessonPlayingStatus={lessonPlayingStatus}
+												allowed={boughtByUser}
 											/>
 										</View>
 									</View>

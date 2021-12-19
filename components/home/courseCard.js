@@ -13,8 +13,6 @@ import { BuyCart } from '../BuyCart';
 import { Button } from 'react-native-paper';
 import { isCourseEnrolled } from '../../axios/learnpress';
 import * as SecureStore from 'expo-secure-store';
-import { useDispatch } from 'react-redux';
-import { cartUpdate, reloadApp } from '../../reducers/authSlice';
 
 const { manifest } = Constants;
 
@@ -74,6 +72,7 @@ export default function CourseCard({
 	pageScreen,
 	cart,
 	token,
+	remove,
 }) {
 	// const router = useRouter();
 	// console.log("data", data);
@@ -81,7 +80,6 @@ export default function CourseCard({
 	const [loading, setLoading] = useState(true);
 	// const [cart, setCart] = useState([]);
 	const [enrolled, setEnrolled] = useState(false);
-	const dispatch = useDispatch();
 
 	// console.log(loading);
 
@@ -114,31 +112,12 @@ export default function CourseCard({
 		console.log('start of single course screen', pageScreen);
 		data['from'] = pageScreen;
 
-		navigation.navigate('Home', {
-			screen: 'CourseDetails',
+		navigation.navigate('My Courses', {
+			screen: 'CourseSingle',
 			params: data,
 		});
 	};
 
-	const remove = async () => {
-		console.log('you clicked remove from Cart button');
-		// navigation.push('Home', {
-		// 	screen: 'Cart',
-		// });
-		try {
-			// var cart = await SecureStore.getItemAsync('cart');
-			var cart = await SecureStore.getItemAsync('cart');
-			cart = JSON.parse(cart);
-			var a = cart.filter((e) => e.ID !== data.ID);
-			await SecureStore.setItemAsync('cart', JSON.stringify(a));
-
-			dispatch(cartUpdate(a.length));
-			dispatch(reloadApp());
-			setLoading(false);
-		} catch (e) {
-			console.log(e);
-		}
-	};
 	// console.log(pageScreen);
 
 	return (
@@ -259,6 +238,7 @@ export default function CourseCard({
 												justifyContent: 'center',
 												alignItems: 'center',
 												flex: 2,
+												marginRight: 20,
 											}}
 										>
 											<View>
@@ -283,7 +263,7 @@ export default function CourseCard({
 
 							{pageScreen === 'Cart' && (
 								<View style={{ flex: 1 }}>
-									<Button onPress={remove}>Remove From Cart</Button>
+									<Button onPress={() => remove(data)}>Remove From Cart</Button>
 								</View>
 							)}
 						</View>

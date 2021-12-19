@@ -195,6 +195,7 @@ export const CourseSingle = (props) => {
 															courseId={courseId}
 															lessonsOfSection={lessonsOfSection}
 															lessonPlayingStatus={lessonPlayingStatus}
+															allowed={true}
 														/>
 													</View>
 												</View>

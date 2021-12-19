@@ -19,6 +19,7 @@ export const SectionView = ({
 	courseId,
 	lessonsOfSection,
 	lessonPlayingStatus,
+	allowed,
 }) => {
 	const listOfLesson = lessonsOfSection[sectionId];
 	// const renders = React.useRef(0);
@@ -39,6 +40,7 @@ export const SectionView = ({
 				courseTitle={courseTitle}
 				courseId={courseId}
 				status={lessonPlayingStatus}
+				allowed={allowed}
 			/>
 			{/* <Text>{renders.current++}</Text>
 				<Button onPress={() => lessonClickedHandler(lsn)}>Click Me</Button> */}
