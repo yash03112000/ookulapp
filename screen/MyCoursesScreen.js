@@ -76,7 +76,7 @@ export const MyCoursesScreen = ({ item: data, navigation }) => {
 				) : (
 					<View>
 						<FlatList
-							style={{ paddingBottom: 25, paddingTop: 5 }}
+							style={{ marginBottom: 130 }}
 							// horizontal
 							// showsVerticalScrollIndicator
 							data={courses}

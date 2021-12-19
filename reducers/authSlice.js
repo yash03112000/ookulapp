@@ -49,10 +49,10 @@ const authSlice = createSlice({
 		},
 		cartUpdate: (state, actions) => {
 			state.cartCount = actions.payload;
-			if (actions.payload === 0) state.reload++;
+			// if (actions.payload === 0) state.reload++;
 		},
 		reloadApp: (state) => {
-			// state++;
+			state.reload++;
 		},
 	},
 });

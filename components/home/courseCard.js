@@ -183,7 +183,7 @@ export default function CourseCard({
 					{(pageScreen === 'CourseSingle' || pageScreen == 'Cart') && (
 						<View
 							style={{
-								height: 200,
+								height: pageScreen === 'CourseSingle' ? 100 : 200,
 								width,
 								// padding: 2,
 								marginVertical: 6,

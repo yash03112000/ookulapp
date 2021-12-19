@@ -5,7 +5,8 @@ import { CourseAccess } from '../components/CourseAccess';
 import axiosInstance from '../axios/orgin';
 import * as SecureStore from 'expo-secure-store';
 import { useSelector, useDispatch } from 'react-redux';
-import { cartUpdate } from '../reducers/authSlice';
+import { cartUpdate, reloadApp } from '../reducers/authSlice';
+
 /**
  * @author
  * @function CourseDetails
@@ -15,6 +16,8 @@ export const BuyCart = ({ navigation, data, enrolled, cart, pageScreen }) => {
 
 	const [status, setStatus] = useState('');
 	const dispatch = useDispatch();
+	const reload = useSelector((state) => state.auth.reload);
+	// console.log(reload);
 
 	useEffect(async () => {
 		try {
@@ -41,7 +44,7 @@ export const BuyCart = ({ navigation, data, enrolled, cart, pageScreen }) => {
 		} catch (e) {
 			console.log(e);
 		}
-	}, []);
+	}, [reload]);
 
 	const enter = () => {
 		// console.log("start of single course screen", pageScreen);

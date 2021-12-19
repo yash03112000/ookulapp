@@ -57,7 +57,7 @@ export const Cart = (props) => {
 			setItems(a);
 			await SecureStore.setItemAsync('cart', JSON.stringify(a));
 			dispatch(cartUpdate(a.length));
-			// dispatch(reloadApp());
+			dispatch(reloadApp());
 			setLoading(false);
 		} catch (e) {
 			console.log(e);

@@ -98,8 +98,8 @@ export const CheckoutScreen = () => {
 			// var cart = await SecureStore.getItemAsync('cart');
 			await SecureStore.setItemAsync('cart', JSON.stringify([]));
 			dispatch(cartUpdate(0));
+			dispatch(reloadApp());
 			navigation.navigate('My Courses');
-			// useDispatch(reloadApp());
 			setLoading(false);
 		} catch (e) {
 			console.log(e);
