@@ -194,11 +194,7 @@ export const CourseDetails = (props) => {
 							<View>
 								{sections.map((sec) => (
 									<View key={sec.section_id.toString()}>
-										<Text style={styles.sectionTitle}>
-											{' '}
-											{sec.section_name} {' #'}
-											{sec.section_id.toString()}
-										</Text>
+										<Text style={styles.sectionTitle}> {sec.section_name}</Text>
 										<View>
 											<SectionView
 												sectionId={sec.section_id}

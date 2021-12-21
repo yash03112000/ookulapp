@@ -74,9 +74,9 @@ export const LessonView = ({
 		let local = '';
 		if (lsn['type'] === 'video') {
 			if (index === 0) {
-				link = lsn['video_download_sd_l'];
-			} else {
 				link = lsn['video_download_sd_m'];
+			} else {
+				link = lsn['video_download_sd_l'];
 			}
 			local = '.mp4';
 			setDownload((prev) => ({
@@ -154,8 +154,24 @@ export const LessonView = ({
 			// console.log(a);
 			const file = await FileSystem.getInfoAsync(a, {});
 			// console.log(file.exists);
-			if (file.exists) setDoStatus(true);
-			else {
+			if (file.exists) {
+				var downlist = await SecureStore.getItemAsync('downlist');
+				downlist = JSON.parse(downlist);
+				data = lsn;
+				if (downlist) {
+					if (downlist.filter((e) => e.ID === data.ID).length > 0) {
+						console.log('Already In downlist');
+						setDoStatus(true);
+					} else {
+						console.log('Already In downlist');
+						setDoStatus(false);
+						await FileSystem.deleteAsync(a, {});
+					}
+				} else {
+					setDoStatus(false);
+					await FileSystem.deleteAsync(a, {});
+				}
+			} else {
 				setDoStatus(false);
 			}
 			setLoad(false);
@@ -176,11 +192,7 @@ export const LessonView = ({
 				onPress={() => lessonClickedHandler(lsn)}
 			>
 				<View>
-					<Text>
-						{lsn.post_title}
-						{' #'}
-						{lsn.ID}
-					</Text>
+					<Text>{lsn.post_title}</Text>
 				</View>
 			</TouchableOpacity>
 			{allowed && (

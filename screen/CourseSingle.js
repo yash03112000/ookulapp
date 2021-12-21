@@ -183,8 +183,7 @@ export const CourseSingle = (props) => {
 												<View key={sec.section_id.toString()}>
 													<Text style={styles.sectionTitle}>
 														{' '}
-														{sec.section_name} {' #'}
-														{sec.section_id.toString()}
+														{sec.section_name}
 													</Text>
 													<View>
 														<SectionView

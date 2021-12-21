@@ -90,11 +90,7 @@ export const DownloadsScreen = () => {
 									style={{ flex: 8 }}
 								>
 									<View>
-										<Text>
-											{lsn.post_title}
-											{' #'}
-											{lsn.ID}
-										</Text>
+										<Text>{lsn.post_title}</Text>
 									</View>
 								</TouchableOpacity>
 								<View style={{ flex: 1 }}>
